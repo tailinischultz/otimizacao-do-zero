@@ -1,0 +1,1880 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Apostila introdutória de otimização e metaheurísticas para quem está começando a faculdade, com exercícios e exemplos em Python ou Java.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%AD%3C/text%3E%3C/svg%3E">
+<style>
+  html { color-scheme: light dark; }
+  body { margin: 0; }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+</style>
+<title>Otimização do Zero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+</head>
+<body>
+<style>
+:root{
+  --paper:#F2F4F2; --surface:#FCFDFC; --surface-2:#E7ECE8;
+  --ink:#16221F; --muted:#57645F; --faint:#8A9691;
+  --line:#D6DDD8; --line-strong:#BDC7C1;
+  --pine:#136B5B; --pine-soft:#DEECE7;
+  --ember:#A8511F; --ember-soft:#F5E5D9;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#111816; --surface:#19211F; --surface-2:#222C28;
+    --ink:#E5ECE8; --muted:#9DAAA4; --faint:#77847E;
+    --line:#2A3531; --line-strong:#3B4742;
+    --pine:#63C1A8; --pine-soft:#14312B;
+    --ember:#E28D57; --ember-soft:#322216;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#111816; --surface:#19211F; --surface-2:#222C28;
+  --ink:#E5ECE8; --muted:#9DAAA4; --faint:#77847E;
+  --line:#2A3531; --line-strong:#3B4742;
+  --pine:#63C1A8; --pine-soft:#14312B;
+  --ember:#E28D57; --ember-soft:#322216;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:17.5px; line-height:1.7; -webkit-font-smoothing:antialiased;
+}
+.page{max-width:700px;margin:0 auto;padding:56px 26px 120px}
+h1{font-family:Spectral,Georgia,serif;font-weight:600;font-size:clamp(36px,6vw,50px);line-height:1.08;letter-spacing:-.02em;margin:0 0 16px;text-wrap:balance}
+h2{font-family:Spectral,Georgia,serif;font-weight:600;font-size:29px;line-height:1.22;margin:0 0 12px;text-wrap:balance}
+h3{font-family:Spectral,Georgia,serif;font-weight:600;font-size:21px;line-height:1.3;margin:38px 0 8px;text-wrap:balance}
+h4{font-size:15px;font-weight:600;margin:26px 0 6px}
+p{margin:0 0 16px}
+a{color:var(--pine)}
+ul,ol{margin:0 0 18px;padding-left:24px}
+li{margin-bottom:8px}
+li::marker{color:var(--faint)}
+code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.87em;background:var(--surface-2);padding:1px 5px;border-radius:3px}
+section{padding:64px 0 4px;border-top:1px solid var(--line);scroll-margin-top:16px}
+.num{
+  display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:12px;
+  letter-spacing:.16em;color:var(--pine);margin-bottom:12px;
+}
+.lede{font-size:19.5px;line-height:1.55;color:var(--muted);margin-bottom:28px}
+
+/* sumário */
+.toc{background:var(--surface);border:1px solid var(--line);border-radius:3px;padding:22px 26px;margin:34px 0 10px}
+.toc h2{font-size:15px;font-family:"IBM Plex Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);font-weight:500;margin-bottom:14px}
+.toc ol{list-style:none;padding:0;margin:0;counter-reset:t}
+.toc li{margin:0;border-bottom:1px solid var(--line)}
+.toc li:last-child{border-bottom:none}
+.toc a{display:grid;grid-template-columns:30px 1fr;gap:8px;padding:9px 0;text-decoration:none;color:var(--ink);font-size:16.5px}
+.toc a:hover{color:var(--pine)}
+.toc a span:first-child{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--faint)}
+
+/* blocos */
+.box{background:var(--surface);border:1px solid var(--line-strong);border-radius:3px;padding:18px 20px;margin:24px 0}
+.box p:last-child{margin-bottom:0}
+.box .t{font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;font-weight:600;color:var(--pine);margin-bottom:6px;font-family:"IBM Plex Mono",monospace}
+.box.alerta{border-color:var(--ember);background:var(--ember-soft)}
+.box.alerta .t{color:var(--ember)}
+
+pre{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13.6px;line-height:1.65;
+  background:var(--surface);border:1px solid var(--line-strong);border-radius:3px;
+  padding:15px 16px;overflow-x:auto;margin:22px 0;
+}
+pre .cm{color:var(--faint);font-style:italic}
+pre .kw{color:var(--pine)}
+
+.tbl{overflow-x:auto;margin:22px 0;border:1px solid var(--line);border-radius:3px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:15.5px;font-variant-numeric:tabular-nums}
+th,td{padding:9px 13px;text-align:left;border-bottom:1px solid var(--line)}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;background:var(--surface-2)}
+tbody tr:last-child td{border-bottom:none}
+td.n,th.n{text-align:right}
+
+/* exercícios */
+.ex{margin:36px 0;padding:22px 24px 8px;border:1px solid var(--line-strong);border-top:3px solid var(--ember);border-radius:3px;background:var(--surface)}
+.ex > h4{margin:0 0 16px;font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--ember)}
+.ex > ol > li{margin-bottom:18px}
+details{margin:10px 0 2px;border-top:1px dashed var(--line-strong);padding-top:8px}
+summary{cursor:pointer;font-size:13px;color:var(--muted);font-family:"IBM Plex Mono",monospace;letter-spacing:.05em;text-transform:uppercase;list-style:none;display:inline-flex;gap:7px;align-items:center}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"+";color:var(--ember);font-weight:600;width:9px;display:inline-block}
+details[open] summary::before{content:"–"}
+summary:hover{color:var(--ink)}
+details > div{padding:10px 0 4px;font-size:16px;color:var(--muted)}
+details > div p:last-child{margin-bottom:0}
+details pre{font-size:13px;background:var(--surface-2);border-color:var(--line);color:var(--ink)}
+:focus-visible{outline:2px solid var(--pine);outline-offset:2px;border-radius:2px}
+
+/* figura */
+figure{margin:28px 0}
+figcaption{font-size:14px;color:var(--faint);margin-top:10px}
+
+/* laboratório do slider */
+.lab{border:1px solid var(--line-strong);border-radius:3px;background:var(--surface);padding:20px 22px;margin:26px 0}
+.lab .row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+.lab label{font-size:13.5px;color:var(--muted)}
+.lab input[type=range]{flex:1;min-width:170px;accent-color:var(--pine)}
+.lab output{font-family:"IBM Plex Mono",monospace;color:var(--pine);font-variant-numeric:tabular-nums;font-weight:500}
+.bars{display:grid;gap:11px}
+.bar{display:grid;grid-template-columns:118px 1fr 54px;align-items:center;gap:10px;font-size:13.5px}
+.bar .track{display:block;height:13px;background:var(--surface-2);border-radius:2px;overflow:hidden}
+.bar .fill{display:block;width:0;height:100%;background:var(--ember);border-radius:2px;transition:width .12s linear}
+.bar .lbl{color:var(--muted);font-size:13px}
+.bar .val{font-family:"IBM Plex Mono",monospace;text-align:right;font-variant-numeric:tabular-nums;font-size:13px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* ---------- alternativas ---------- */
+.alts{display:grid;gap:7px;margin:14px 0 4px}
+.alt{
+  display:grid;grid-template-columns:26px 1fr;gap:10px;align-items:start;
+  width:100%;text-align:left;cursor:pointer;
+  font:inherit;font-size:15.5px;line-height:1.5;color:var(--ink);
+  background:var(--paper);border:1px solid var(--line-strong);border-radius:3px;
+  padding:10px 13px;
+}
+.alt:hover{border-color:var(--pine);background:var(--pine-soft)}
+.alt .k{
+  font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:500;
+  color:var(--faint);text-transform:lowercase;padding-top:1px;
+}
+.alts.respondida .alt{cursor:default}
+.alts.respondida .alt:hover{border-color:var(--line-strong);background:var(--paper)}
+.alt.certa{border-color:var(--pine);background:var(--pine-soft)}
+.alt.certa .k{color:var(--pine);font-weight:600}
+.alt.errada{border-color:var(--ember);background:var(--ember-soft)}
+.alt.errada .k{color:var(--ember);font-weight:600}
+.alts.respondida .alt:not(.certa):not(.errada){opacity:.5}
+.fb{
+  margin:10px 0 2px;font-size:14.5px;font-weight:500;
+  display:flex;gap:8px;align-items:baseline;
+}
+.fb.ok{color:var(--pine)}
+.fb.nao{color:var(--ember)}
+
+/* ---------- questão aberta ---------- */
+.aberta{margin:14px 0 4px}
+.destrava{
+  font:inherit;font-size:14.5px;cursor:pointer;color:var(--muted);
+  background:var(--paper);border:1px dashed var(--line-strong);border-radius:3px;
+  padding:9px 15px;
+}
+.destrava:hover{color:var(--ink);border-color:var(--pine)}
+
+/* ---------- gabarito travado ---------- */
+details.trava > summary{cursor:not-allowed;color:var(--faint)}
+details.trava > summary::before{content:"×";color:var(--faint)}
+details.trava.livre > summary{cursor:pointer;color:var(--muted)}
+details.trava.livre > summary::before{content:"+";color:var(--ember)}
+details.trava.livre[open] > summary::before{content:"–"}
+
+/* ---------- progresso ---------- */
+.prog{
+  margin:14px 0 0;padding-top:14px;border-top:1px solid var(--line);
+  font-size:14px;color:var(--muted);display:flex;justify-content:space-between;
+  gap:12px;flex-wrap:wrap;align-items:baseline;
+}
+.prog b{color:var(--pine);font-variant-numeric:tabular-nums}
+.reset{
+  font:inherit;font-size:13.5px;background:none;border:none;padding:0;
+  color:var(--faint);text-decoration:underline;cursor:pointer;
+}
+.reset:hover{color:var(--ember)}
+
+/* ---------- troca de linguagem ---------- */
+:root[data-lang="java"] .py{display:none!important}
+:root[data-lang="py"] .jv{display:none!important}
+.capa{display:none}
+:root:not(.escolhido) .capa{display:flex}
+:root:not(.escolhido) .conteudo{display:none}
+
+.capa{
+  min-height:88vh;align-items:center;justify-content:center;
+  padding:48px 26px;background:var(--paper);
+}
+.capa-caixa{max-width:640px;width:100%}
+.capa .num{margin-bottom:14px}
+.capa h1{margin-bottom:14px}
+.capa .sub{font-size:18.5px;line-height:1.55;color:var(--muted);margin-bottom:34px}
+.capa .pergunta{font-size:16px;font-weight:600;margin-bottom:16px}
+.escolhas{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.escolha{
+  display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;
+  width:100%;text-align:left;cursor:pointer;font:inherit;
+  background:var(--surface);border:1px solid var(--line-strong);border-radius:4px;
+  padding:20px 20px 18px;color:var(--ink);
+}
+.escolha:hover{border-color:var(--pine);box-shadow:0 2px 10px rgba(19,107,91,.10)}
+.escolha .nome{font-family:Spectral,Georgia,serif;font-size:24px;font-weight:600;margin-bottom:3px}
+.escolha .obs{font-size:13.5px;color:var(--faint);margin-bottom:14px}
+.escolha .amostra{
+  font-family:"IBM Plex Mono",monospace;font-size:11.8px;line-height:1.55;
+  background:var(--surface-2);border-radius:3px;padding:10px 11px;margin:0;
+  overflow-x:auto;white-space:pre;color:var(--muted);
+}
+.capa .rodape{margin:26px 0 0;font-size:14px;color:var(--faint)}
+
+.troca{display:flex;align-items:center;gap:10px;margin-bottom:26px;font-size:13.5px;color:var(--faint)}
+.seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:3px;overflow:hidden}
+.seg button{
+  font:inherit;font-size:13.5px;cursor:pointer;padding:5px 13px;
+  background:var(--surface);border:none;color:var(--muted);
+}
+.seg button + button{border-left:1px solid var(--line-strong)}
+.seg button:hover{color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--pine);color:#FBFCFB}
+@media (max-width:560px){ .escolhas{grid-template-columns:1fr} }
+
+@media (max-width:640px){ .page{padding:36px 20px 90px} body{font-size:17px} .alt{font-size:15px} }
+</style>
+
+<script>
+(function () {
+  try {
+    var l = localStorage.getItem("otimizacao-zero-linguagem");
+    if (l === "py" || l === "java") {
+      document.documentElement.setAttribute("data-lang", l);
+      document.documentElement.classList.add("escolhido");
+    }
+  } catch (e) {}
+})();
+</script>
+<noscript><style>.capa{display:none}:root:not(.escolhido) .conteudo{display:block}.jv{display:none}</style></noscript>
+
+<div class="capa">
+  <div class="capa-caixa">
+    <div class="num">CADERNO DE ESTUDO</div>
+    <h1>Otimização do Zero</h1>
+    <p class="sub">Como o computador escolhe bem quando existem opções demais para testar todas. Do primeiro conceito até resolver um problema de verdade, com exercícios em todas as partes.</p>
+    <p class="pergunta">Em qual linguagem você quer ver os exemplos de código?</p>
+    <div class="escolhas">
+      <button type="button" class="escolha" data-escolha="py">
+        <div class="nome">Python</div>
+        <div class="obs">Mais curto, menos cerimônia</div>
+        <pre class="amostra">def nota(resposta):
+    total = 0
+    for i in range(5):
+        total += util[i] * resposta[i]
+    return total</pre>
+      </button>
+      <button type="button" class="escolha" data-escolha="java">
+        <div class="nome">Java</div>
+        <div class="obs">Tipos explícitos, comum na faculdade</div>
+        <pre class="amostra">static int nota(int[] resposta) {
+    int total = 0;
+    for (int i = 0; i &lt; 5; i++) {
+        total += util[i] * resposta[i];
+    }
+    return total;
+}</pre>
+      </button>
+    </div>
+    <p class="rodape">O conteúdo é o mesmo nas duas. Só mudam os exemplos de código, e dá para trocar a qualquer momento, lá no topo da página.</p>
+  </div>
+</div>
+
+<div class="page conteudo">
+
+<header>
+  <div class="troca">
+    <span>Exemplos de código em</span>
+    <div class="seg" role="group" aria-label="Linguagem dos exemplos">
+      <button type="button" data-lang="py" aria-pressed="false">Python</button>
+      <button type="button" data-lang="java" aria-pressed="false">Java</button>
+    </div>
+  </div>
+  <div class="num">CADERNO DE ESTUDO</div>
+  <h1>Otimização do Zero</h1>
+  <p class="lede">Um primeiro contato com a área da computação que ensina o computador a escolher bem quando existem opções demais para testar todas. Escrito para quem está começando a faculdade e nunca viu o assunto.</p>
+  <p>Você não precisa saber nada além de matemática do ensino médio e <span class="py">um pouquinho de Python (listas, <code>for</code> e <code>if</code>)</span><span class="jv">um pouquinho de Java (vetores, <code>for</code> e <code>if</code>)</span>. Todos os exemplos usam números pequenos, de propósito: dá para conferir tudo no papel.</p>
+
+  <div class="box">
+    <div class="t">Como funcionam os exercícios</div>
+    <p>Cada exercício tem quatro alternativas. <strong>Escolha uma antes de ver a explicação:</strong> ela só é liberada depois que você responde, e vale uma tentativa por questão. Errar faz parte, e a explicação mostra exatamente onde o raciocínio escorregou. Nas questões de programar não há alternativas, e aí basta clicar em "já tentei" quando quiser conferir. Suas respostas ficam salvas neste navegador.</p>
+  </div>
+
+  <div class="toc">
+    <h2>O caminho</h2>
+    <ol>
+      <li><a href="#p1"><span>1</span><span>O problema de ter opções demais</span></a></li>
+      <li><a href="#p2"><span>2</span><span>Escrever uma resposta e dar nota para ela</span></a></li>
+      <li><a href="#p3"><span>3</span><span>Vizinhos: mudar um pouquinho</span></a></li>
+      <li><a href="#p4"><span>4</span><span>Descer a montanha no escuro</span></a></li>
+      <li><a href="#p5"><span>5</span><span>O vale errado</span></a></li>
+      <li><a href="#p6"><span>6</span><span>Quatro jeitos de sair do vale errado</span></a></li>
+      <li><a href="#p7"><span>7</span><span>Um exemplo com mapa: o entregador</span></a></li>
+      <li><a href="#p8"><span>8</span><span>Como saber se o seu programa é bom</span></a></li>
+      <li><a href="#p9"><span>9</span><span>Mini-projeto</span></a></li>
+      <li><a href="#p10"><span>10</span><span>E aqueles dois PDFs?</span></a></li>
+      <li><a href="#dic"><span>11</span><span>Dicionário de palavras difíceis</span></a></li>
+    </ol>
+    <p class="prog"><span>Exercícios respondidos: <b id="feitos">0</b> de <b id="total">42</b></span><button type="button" class="reset" id="reset">recomeçar do zero</button></p>
+  </div>
+</header>
+
+<section id="p1">
+  <div class="num">PARTE 1</div>
+  <h2>O problema de ter opções demais</h2>
+  <p class="lede">Alguns problemas são difíceis não porque a conta é complicada, mas porque existem respostas demais para testar.</p>
+
+  <p>Imagine que você vai viajar e tem uma mochila que aguenta 23 kg. Na sua frente estão 5 itens. Cada um tem um peso e uma nota de "quanto isso me faz falta":</p>
+
+  <div class="tbl"><table>
+    <thead><tr><th>Item</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th></tr></thead>
+    <tbody>
+      <tr><td>Peso (kg)</td><td class="n">4</td><td class="n">5</td><td class="n">7</td><td class="n">9</td><td class="n">6</td></tr>
+      <tr><td>Utilidade</td><td class="n">2</td><td class="n">2</td><td class="n">3</td><td class="n">4</td><td class="n">4</td></tr>
+    </tbody>
+  </table></div>
+
+  <p>Cada item pode entrar ou não entrar. São duas opções para o item 1, duas para o item 2, e assim por diante. Total: 2 × 2 × 2 × 2 × 2 = <strong>32 combinações</strong>. Dá para testar as 32 na mão numa tarde.</p>
+
+  <p>Repare no formato dessa conta: é o número 2 multiplicado por ele mesmo uma vez para cada item. Isso se escreve de forma abreviada como 2<sup>5</sup>, que se lê "dois elevado a cinco". Com 8 itens seriam 2<sup>8</sup>, com 40 itens seriam 2<sup>40</sup>, e assim por diante. Vamos usar essa abreviação daqui para frente, então vale fixar a ideia:</p>
+
+  <div class="box">
+    <div class="t">A regra da mochila</div>
+    <p>Se a mochila tem <strong>N itens</strong>, e cada item pode entrar ou ficar de fora, o número de combinações diferentes é <strong>2 multiplicado por ele mesmo N vezes</strong>, ou seja, 2<sup>N</sup>.</p>
+  </div>
+
+  <p>Agora aumente o número de itens. A coluna do tempo supõe um computador que testa 100 milhões de combinações por segundo, que é uma velocidade realista para um notebook comum:</p>
+
+  <div class="tbl"><table>
+    <thead><tr><th>Itens</th><th>Combinações</th><th>Tempo do computador</th></tr></thead>
+    <tbody>
+      <tr><td>5</td><td>32</td><td>instantâneo</td></tr>
+      <tr><td>20</td><td>1 milhão</td><td>menos de 1 segundo</td></tr>
+      <tr><td>40</td><td>1 trilhão</td><td>cerca de 3 horas</td></tr>
+      <tr><td>60</td><td>1 quintilhão</td><td>mais de 300 anos</td></tr>
+      <tr><td>100</td><td>um número com 31 dígitos</td><td>mais tempo que a idade do universo</td></tr>
+    </tbody>
+  </table></div>
+
+  <p>Repare no que aconteceu. Passar de 5 para 100 itens não deixou o problema 20 vezes mais difícil. Deixou ele impossível. E o motivo é simples: <strong>cada item novo dobra o número de combinações</strong>.</p>
+
+  <div class="box">
+    <div class="t">A ideia central</div>
+    <p>Comprar um computador duas vezes mais rápido resolve apenas <em>um item a mais</em>. Não adianta esperar a tecnologia melhorar. Precisamos de uma ideia melhor, não de uma máquina melhor.</p>
+  </div>
+
+  <p>É aí que entra a otimização: em vez de testar tudo, o computador procura de um jeito esperto. Ele não garante a melhor resposta do mundo, mas costuma achar uma resposta muito boa em segundos.</p>
+
+  <div class="ex">
+    <h4>Exercícios da parte 1</h4>
+    <ol>
+      <li>Sua mochila agora tem <strong>8 itens</strong> em vez de 5. Cada um deles pode entrar ou ficar de fora. Quantas combinações diferentes de itens existem?
+        <div class="alts" data-c="d">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">16, porque são 8 itens vezes 2</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">64, porque são 8 vezes 8</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">40 320, porque é 8 × 7 × 6 × 5 × 4 × 3 × 2 × 1</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">256</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q0"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div><p>São 2<sup>8</sup>, ou seja, 2 × 2 × 2 × 2 × 2 × 2 × 2 × 2 = <strong>256 combinações</strong>. A conta tem oito números 2 porque existe uma decisão de "entra ou não entra" para cada um dos oito itens.</p></div></details>
+      </li>
+      <li>Você acabou de ver que 5 itens dão 32 combinações e 8 itens dão 256. Se você acrescentar <strong>um único</strong> item a uma mochila qualquer, o que acontece com o número de combinações?
+        <div class="alts" data-c="a">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">Dobra</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">Aumenta em 1</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">Fica elevado ao quadrado</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">Aumenta em 2</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q1"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div><p>Ele <strong>dobra</strong>. O item novo pode entrar ou ficar de fora, então cada combinação que já existia vira duas: uma com o item novo dentro e outra com ele fora. Por isso 5 itens dão 32 e 6 itens dão 64.</p></div></details>
+      </li>
+      <li>Liste no papel todas as combinações possíveis com 3 itens, usando 0 para "fica de fora" e 1 para "vai na mochila". Confira se deram 8. Agora olhe a sua lista: <strong>quantas dessas combinações colocam exatamente 2 itens na mochila?</strong>
+        <div class="alts" data-c="b">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">2 combinações</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">3 combinações</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">4 combinações</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">6 combinações</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q2"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div>
+        <p>A lista completa é: 000, 001, 010, 011, 100, 101, 110, 111. São 8 combinações, que é 2<sup>3</sup>. Uma curiosidade: essa lista é exatamente a contagem de 0 a 7 escrita em números binários.</p>
+        <p>Com exatamente 2 itens na mochila, ou seja, com exatamente dois números 1, são <strong>3 combinações</strong>: 011, 101 e 110. Elas correspondem a escolher qual dos três itens fica de fora, e por isso são três.</p>
+        </div></details>
+      </li>
+      <li>A tabela acima mostra 40 itens e 60 itens, mas não mostra 50. Usando a mesma velocidade de 100 milhões de combinações por segundo, quanto tempo levaria testar todas as combinações de <strong>50 itens</strong>?
+        <div class="alts" data-c="d">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">Cerca de 130 anos</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">Cerca de 13 minutos</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">Cerca de 13 anos</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">Cerca de 130 dias</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q3"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div><p>São 2<sup>50</sup> combinações, aproximadamente 1,1 quatrilhão (o número 11 seguido de 14 zeros). Dividindo por 100 milhões por segundo, dá cerca de 11 milhões de segundos. Convertendo para dias: 11 milhões dividido por 86 400 segundos que tem um dia, o resultado é <strong>aproximadamente 130 dias</strong> com o computador ligado sem parar. E isso é só 50 itens.</p></div></details>
+      </li>
+      <li>Pense em um problema do seu dia a dia que tenha "opções demais". Escreva em uma frase qual é a escolha e o que você quer maximizar ou minimizar.
+        <div class="aberta"><button type="button" class="destrava">Já tentei, quero ver a resposta</button></div>
+        <details class="trava" data-q="q4"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div><p>Não existe resposta única. Exemplos válidos: montar a grade de matérias do semestre (escolher quais matérias, minimizando buracos entre aulas), escolher a rota do ônibus até a faculdade (minimizar tempo), montar um time no jogo (maximizar pontuação dentro de um orçamento). O importante é você conseguir dizer <em>o que escolhe</em> e <em>o que quer melhorar</em>.</p></div></details>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section id="p2">
+  <div class="num">PARTE 2</div>
+  <h2>Escrever uma resposta e dar nota para ela</h2>
+  <p class="lede">Antes de programar qualquer coisa, você precisa responder duas perguntas: como uma resposta é escrita, e como se decide qual de duas respostas é melhor.</p>
+
+  <h3>Como escrever uma resposta</h3>
+  <p>Na mochila, uma resposta é só uma <span class="py">lista</span><span class="jv">vetor</span> de 0 e 1, uma posição para cada item:</p>
+  <pre class="py">[0, 0, 1, 1, 1]
+ ↑  ↑  ↑  ↑  ↑
+ 1  2  3  4  5     <span class="cm"># itens 3, 4 e 5 vão na mochila</span></pre>
+<pre class="jv">int[] resposta = {0, 0, 1, 1, 1};
+<span class="cm">//                ^  ^  ^  ^  ^</span>
+<span class="cm">//                1  2  3  4  5   itens 3, 4 e 5 vão na mochila</span></pre>
+  <p>Isso tem um nome: <strong>representação</strong>. Escolher bem a representação é a primeira decisão de qualquer programa de otimização. Para a mochila, <span class="py">uma lista</span><span class="jv">um vetor</span> de 0 e 1 é a escolha natural.</p>
+
+  <h3>Como dar nota</h3>
+  <p>A nota é a soma das utilidades dos itens escolhidos. Para <code>[0, 0, 1, 1, 1]</code>: 3 + 4 + 4 = <strong>11</strong>.</p>
+  <p>Isso também tem nome: <strong>função objetivo</strong>. É só uma função que recebe uma resposta e devolve um número. Quanto maior, melhor (neste caso, porque queremos <em>maximizar</em> a utilidade).</p>
+
+  <h3>A regra que não pode ser quebrada</h3>
+  <p>A mochila aguenta 23 kg. A resposta <code>[0, 0, 1, 1, 1]</code> pesa 7 + 9 + 6 = 22 kg, então está tudo bem. Já <code>[1, 1, 1, 1, 1]</code> pesaria 31 kg: essa resposta é <strong>inválida</strong>.</p>
+  <p>Regras assim se chamam <strong>restrições</strong>. Todo problema de otimização tem esses três pedaços:</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Pedaço</th><th>Pergunta que ele responde</th><th>Na mochila</th></tr></thead>
+    <tbody>
+      <tr><td>Representação</td><td>Como escrevo uma resposta?</td><td><span class="py">Lista</span><span class="jv">Vetor</span> de 0 e 1</td></tr>
+      <tr><td>Função objetivo</td><td>Quanto vale essa resposta?</td><td>Soma das utilidades</td></tr>
+      <tr><td>Restrições</td><td>Essa resposta é permitida?</td><td>Peso total até 23 kg</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3><span class="py">Em Python</span><span class="jv">Em Java</span></h3>
+  <pre class="py">peso     = [4, 5, 7, 9, 6]
+utilidade = [2, 2, 3, 4, 4]
+CAPACIDADE = 23
+
+def peso_total(resposta):
+    total = 0
+    for i in range(5):
+        total = total + peso[i] * resposta[i]
+    return total
+
+def nota(resposta):
+    <span class="cm"># se estourar a mochila, a resposta vale zero</span>
+    if peso_total(resposta) &gt; CAPACIDADE:
+        return 0
+    total = 0
+    for i in range(5):
+        total = total + utilidade[i] * resposta[i]
+    return total
+
+print(nota([0, 0, 1, 1, 1]))   <span class="cm"># 11</span>
+print(nota([1, 1, 1, 1, 1]))   <span class="cm"># 0, porque pesa 31 kg</span></pre>
+<pre class="jv">static int[] peso      = {4, 5, 7, 9, 6};
+static int[] utilidade = {2, 2, 3, 4, 4};
+static final int CAPACIDADE = 23;
+
+static int pesoTotal(int[] resposta) {
+    int total = 0;
+    for (int i = 0; i &lt; 5; i++) {
+        total = total + peso[i] * resposta[i];
+    }
+    return total;
+}
+
+static int nota(int[] resposta) {
+    <span class="cm">// se estourar a mochila, a resposta vale zero</span>
+    if (pesoTotal(resposta) &gt; CAPACIDADE) {
+        return 0;
+    }
+    int total = 0;
+    for (int i = 0; i &lt; 5; i++) {
+        total = total + utilidade[i] * resposta[i];
+    }
+    return total;
+}
+
+public static void main(String[] args) {
+    System.out.println(nota(new int[]{0, 0, 1, 1, 1}));   <span class="cm">// 11</span>
+    System.out.println(nota(new int[]{1, 1, 1, 1, 1}));   <span class="cm">// 0, porque pesa 31 kg</span>
+}</pre>
+
+  <div class="box alerta">
+    <div class="t">Cuidado</div>
+    <p>Dar nota zero para respostas inválidas funciona bem em problemas pequenos, e é o suficiente para este caderno. Programas maiores usam um truque melhor: em vez de zerar, descontam pontos proporcionalmente ao tamanho do erro. Assim o programa consegue perceber que "estourou por 1 kg" é menos ruim que "estourou por 20 kg".</p>
+  </div>
+
+  <div class="ex">
+    <h4>Exercícios da parte 2</h4>
+    <p style="margin:-4px 0 18px;font-size:14.5px;color:var(--muted);border-left:2px solid var(--line-strong);padding-left:12px">
+      Lembrete dos dados: pesos <strong>4, 5, 7, 9, 6</strong> &middot; utilidades <strong>2, 2, 3, 4, 4</strong> &middot; a mochila aguenta <strong>23&nbsp;kg</strong>.
+    </p>
+    <ol>
+      <li>Qual a nota e o peso de <code>[1, 1, 0, 1, 0]</code>? Ela é válida?
+        <div class="alts" data-c="d">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">Peso 9 kg, nota 8, e é válida</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">Peso 18 kg, nota 0, porque é inválida</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">Peso 25 kg, nota 8, e é inválida</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">Peso 18 kg, nota 8, e é válida</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q5"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div><p>Peso: 4 + 5 + 9 = 18 kg, dentro do limite, então é válida. Nota: 2 + 2 + 4 = 8.</p></div></details>
+      </li>
+      <li>Qual a nota de <code>[0, 1, 1, 1, 1]</code>?
+        <div class="alts" data-c="b">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">11</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">0</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">13</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">27</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q6"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div><p>Peso: 5 + 7 + 9 + 6 = 27 kg. Passou de 23, então é inválida e a função devolve 0.</p></div></details>
+      </li>
+      <li>Procure no papel a melhor resposta possível, sem usar o computador. Dica: como a mochila aguenta 23 kg, comece listando só as combinações que pesam entre 18 e 23 kg, que são poucas, e calcule a nota de cada uma. <strong>Qual é a maior nota que dá para conseguir?</strong>
+        <div class="alts" data-c="b">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">Nota 12</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">Nota 11</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">Nota 10</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">Nota 9</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q7"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div>
+        <p>A maior nota possível é <strong>11</strong>. E aqui vem uma surpresa: <strong>duas</strong> respostas diferentes chegam a 11, e as duas pesam exatamente 22 kg.</p>
+        <p><code>[0, 0, 1, 1, 1]</code>, que leva os itens 3, 4 e 5, e <code>[1, 1, 1, 0, 1]</code>, que leva os itens 1, 2, 3 e 5. As concorrentes mais próximas param em 10: <code>[1, 0, 0, 1, 1]</code> pesa 19, e <code>[0, 1, 0, 1, 1]</code> pesa 20.</p>
+        <p>Guarde isso: quando existe empate no topo, tanto faz qual das duas o programa devolve. As duas são respostas ótimas.</p>
+        </div></details>
+      </li>
+      <li>Escreva um programa que testa todas as 32 combinações e imprime a melhor.
+        <div class="aberta"><button type="button" class="destrava">Já tentei, quero ver a resposta</button></div>
+        <details class="trava" data-q="q8"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div>
+        <pre class="py">from itertools import product
+
+melhor = None
+melhor_nota = -1
+
+for combinacao in product([0, 1], repeat=5):
+    resposta = list(combinacao)      <span class="cm"># product devolve tupla; viramos lista</span>
+    if nota(resposta) &gt; melhor_nota:
+        melhor = resposta
+        melhor_nota = nota(resposta)
+
+print(melhor, melhor_nota)   <span class="cm"># [0, 0, 1, 1, 1] 11</span></pre>
+<pre class="jv">import java.util.Arrays;
+
+int[] melhor = null;
+int melhorNota = -1;
+
+<span class="cm">// cada número de 0 a 31 vira uma combinação de cinco 0 e 1</span>
+for (int mascara = 0; mascara &lt; 32; mascara++) {
+    int[] resposta = new int[5];
+    for (int i = 0; i &lt; 5; i++) {
+        resposta[i] = (mascara &gt;&gt; i) % 2;    <span class="cm">// pega o bit i do número</span>
+    }
+    if (nota(resposta) &gt; melhorNota) {
+        melhor = resposta;
+        melhorNota = nota(resposta);
+    }
+}
+
+System.out.println(Arrays.toString(melhor) + " " + melhorNota);
+<span class="cm">// [0, 0, 1, 1, 1] 11</span></pre>
+        <p>Guarde este programa. Ele é a sua <em>resposta certa de referência</em>: quando você escrever os métodos espertos das próximas partes, poderá comparar o resultado deles com este e ver se acertaram.</p>
+        </div></details>
+      </li>
+      <li>Mude a capacidade para 15 kg e rode o programa de novo. A melhor resposta muda?
+        <div class="alts" data-c="c">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">Muda: a melhor nota passa a ser 6</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">Muda: a melhor nota passa a ser 10</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">Muda: a melhor nota passa a ser 8</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">Não muda: continua sendo 11</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q9"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div><p>Sim. Com 15 kg a nota máxima cai de 11 para <strong>8</strong>, e ela é alcançada por duas respostas diferentes: <code>[0, 0, 0, 1, 1]</code>, que pesa 15 kg, e <code>[1, 1, 0, 0, 1]</code>, que também pesa 15 kg. Duas coisas para guardar daqui: apertar a restrição piora a melhor resposta possível, e <strong>pode existir mais de uma resposta ótima empatada</strong>. Nesse caso, tanto faz qual das duas o programa devolve.</p></div></details>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section id="p3">
+  <div class="num">PARTE 3</div>
+  <h2>Vizinhos: mudar um pouquinho</h2>
+  <p class="lede">A ideia mais importante deste caderno cabe em uma frase: em vez de testar todas as respostas, comece com uma qualquer e vá melhorando aos poucos.</p>
+
+  <p>Mas "melhorar aos poucos" precisa de uma definição. O que é "um pouquinho"?</p>
+  <p>Na mochila, a mudança mais simples possível é <strong>trocar um único item de lugar</strong>: se ele estava dentro, tira; se estava fora, coloca. Cada resposta que você consegue fazendo <em>uma só</em> dessas mudanças é chamada de <strong>vizinha</strong>.</p>
+
+  <p>Veja os vizinhos de <code>[0, 1, 0, 1, 0]</code>:</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Mudança</th><th>Vizinho</th><th class="n">Peso</th><th class="n">Nota</th></tr></thead>
+    <tbody>
+      <tr><td>coloca o item 1</td><td><code>[1, 1, 0, 1, 0]</code></td><td class="n">18</td><td class="n">8</td></tr>
+      <tr><td>tira o item 2</td><td><code>[0, 0, 0, 1, 0]</code></td><td class="n">9</td><td class="n">4</td></tr>
+      <tr><td>coloca o item 3</td><td><code>[0, 1, 1, 1, 0]</code></td><td class="n">21</td><td class="n">9</td></tr>
+      <tr><td>tira o item 4</td><td><code>[0, 1, 0, 0, 0]</code></td><td class="n">5</td><td class="n">2</td></tr>
+      <tr><td>coloca o item 5</td><td><code>[0, 1, 0, 1, 1]</code></td><td class="n">20</td><td class="n">10</td></tr>
+    </tbody>
+  </table></div>
+
+  <p>São 5 vizinhos, um para cada item. A resposta de partida vale 6, e o melhor vizinho vale 10. Ou seja: <strong>olhando só para o lado, já dá para melhorar bastante.</strong></p>
+
+  <div class="box">
+    <div class="t">Por que isso é uma boa ideia</div>
+    <p>Testar todas as respostas com 5 itens custa 32 verificações. Olhar os vizinhos custa apenas 5. Com 100 itens, testar tudo é impossível, mas olhar os vizinhos continua custando só 100. O número de vizinhos cresce devagar, enquanto o número total de respostas explode.</p>
+  </div>
+
+  <h3><span class="py">Em Python</span><span class="jv">Em Java</span></h3>
+  <pre class="py">def vizinhos(resposta):
+    lista = []
+    for i in range(len(resposta)):
+        v = resposta.copy()        <span class="cm"># copia para não estragar a original</span>
+        v[i] = 1 - v[i]            <span class="cm"># 0 vira 1, 1 vira 0</span>
+        lista.append(v)
+    return lista
+
+for v in vizinhos([0, 1, 0, 1, 0]):
+    print(v, nota(v))</pre>
+<pre class="jv">static int[][] vizinhos(int[] resposta) {
+    int[][] lista = new int[resposta.length][];
+    for (int i = 0; i &lt; resposta.length; i++) {
+        int[] v = resposta.clone();    <span class="cm">// clone cria um vetor novo</span>
+        v[i] = 1 - v[i];               <span class="cm">// 0 vira 1, 1 vira 0</span>
+        lista[i] = v;
+    }
+    return lista;
+}
+
+for (int[] v : vizinhos(new int[]{0, 1, 0, 1, 0})) {
+    System.out.println(Arrays.toString(v) + " " + nota(v));
+}</pre>
+
+  <div class="box alerta">
+    <div class="t">Erro muito comum</div>
+    <p class="py">Esquecer o <code>.copy()</code>. Sem ele, o Python não cria uma lista nova: ele guarda um atalho para a mesma lista. Você acaba modificando a resposta original sem querer, e todos os vizinhos saem iguais. Se o seu programa está devolvendo respostas repetidas, olhe o <code>.copy()</code> primeiro.</p>
+    <p class="jv">Esquecer o <code>.clone()</code>. Sem ele, o Java não cria um vetor novo: ele guarda um atalho para o mesmo vetor. Você acaba modificando a resposta original sem querer, e todos os vizinhos saem iguais. Se o seu programa está devolvendo respostas repetidas, olhe o <code>.clone()</code> primeiro.</p>
+  </div>
+
+  <div class="ex">
+    <h4>Exercícios da parte 3</h4>
+    <p style="margin:-4px 0 18px;font-size:14.5px;color:var(--muted);border-left:2px solid var(--line-strong);padding-left:12px">
+      Lembrete dos dados: pesos <strong>4, 5, 7, 9, 6</strong> &middot; utilidades <strong>2, 2, 3, 4, 4</strong> &middot; a mochila aguenta <strong>23&nbsp;kg</strong>.
+    </p>
+    <ol>
+      <li>Liste os 5 vizinhos de <code>[1, 0, 1, 0, 1]</code> e calcule a nota de cada um. <strong>Qual é a nota do melhor vizinho?</strong>
+        <div class="alts" data-c="b">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">10</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">11</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">13</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">9</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q10"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div><p>A resposta de partida pesa 4 + 7 + 6 = 17 e vale 9. Vizinhos: <code>[0,0,1,0,1]</code> peso 13, nota 7; <code>[1,1,1,0,1]</code> peso 22, nota 11; <code>[1,0,0,0,1]</code> peso 10, nota 6; <code>[1,0,1,1,1]</code> peso 26, inválida, nota 0; <code>[1,0,1,0,0]</code> peso 11, nota 5. O melhor vizinho vale 11.</p></div></details>
+      </li>
+      <li>Uma resposta com 5 itens tem 5 vizinhos. E uma com 40 itens?
+        <div class="alts" data-c="d">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">Um número gigante, perto de 1 trilhão</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">780 vizinhos</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">80 vizinhos</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">40 vizinhos</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q11"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div><p>40 vizinhos. O número de vizinhos é sempre igual ao número de itens, porque existe exatamente uma mudança possível por item.</p></div></details>
+      </li>
+      <li>Partindo de <code>[0, 0, 0, 0, 0]</code>, é possível chegar em <code>[1, 1, 1, 1, 1]</code> mudando um item por vez? Quantos passos são necessários?
+        <div class="alts" data-c="d">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">Não é possível</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">Sim, em 10 passos</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">Sim, em 1 passo</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">Sim, em 5 passos</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q12"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div><p>Sim, em 5 passos, um para cada item que precisa mudar. Isso é importante: com essa definição de vizinho, dá para chegar de qualquer resposta a qualquer outra. Se a nossa mudança fosse "trocar dois itens ao mesmo tempo", isso deixaria de ser verdade, e metade das respostas ficaria inalcançável para sempre.</p></div></details>
+      </li>
+      <li>Escreva um programa que, dada uma resposta, imprime o melhor vizinho dela.
+        <div class="aberta"><button type="button" class="destrava">Já tentei, quero ver a resposta</button></div>
+        <details class="trava" data-q="q13"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div>
+        <pre class="py">def melhor_vizinho(resposta):
+    melhor = None
+    melhor_nota = -1
+    for v in vizinhos(resposta):
+        if nota(v) &gt; melhor_nota:
+            melhor = v
+            melhor_nota = nota(v)
+    return melhor, melhor_nota
+
+print(melhor_vizinho([0, 1, 0, 1, 0]))   <span class="cm"># [0, 1, 0, 1, 1] com nota 10</span></pre>
+<pre class="jv"><span class="cm">// em Java um método devolve um valor só, então devolvemos o vizinho</span>
+<span class="cm">// e calculamos a nota dele com nota(...) quando precisar</span>
+static int[] melhorVizinho(int[] resposta) {
+    int[] melhor = null;
+    int melhorNota = -1;
+    for (int[] v : vizinhos(resposta)) {
+        if (nota(v) &gt; melhorNota) {
+            melhor = v;
+            melhorNota = nota(v);
+        }
+    }
+    return melhor;
+}
+
+int[] m = melhorVizinho(new int[]{0, 1, 0, 1, 0});
+System.out.println(Arrays.toString(m) + " " + nota(m));
+<span class="cm">// [0, 1, 0, 1, 1] 10</span></pre>
+        </div></details>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section id="p4">
+  <div class="num">PARTE 4</div>
+  <h2>Descer a montanha no escuro</h2>
+  <p class="lede">Agora que você sabe olhar para os vizinhos, o próximo passo é óbvio: continue indo para o melhor vizinho até que nenhum vizinho seja melhor.</p>
+
+  <p>Imagine que você está numa montanha, no meio da noite, sem lanterna. Você quer chegar ao ponto mais baixo. Não dá para ver o vale lá longe, mas dá para sentir com o pé qual direção desce. Então você faz o óbvio: dá um passo para o lado que desce, e repete.</p>
+
+  <p>Esse método tem nome: <strong>busca local</strong>. É o algoritmo mais simples de otimização que existe, e serve de base para todos os outros.</p>
+
+  <pre><span class="kw">Busca local</span>
+
+1. Comece com uma resposta qualquer
+2. Olhe todos os vizinhos dela
+3. Se algum vizinho for melhor:
+       vá para o melhor deles
+       volte ao passo 2
+   Se nenhum for melhor:
+       pare e devolva a resposta atual</pre>
+
+  <h3>Rodando no papel</h3>
+  <p>Começando em <code>[0, 1, 0, 1, 0]</code>, nota 6:</p>
+  <div class="tbl"><table>
+    <thead><tr><th class="n">Passo</th><th>Resposta atual</th><th class="n">Nota</th><th>Melhor vizinho</th><th class="n">Nota</th></tr></thead>
+    <tbody>
+      <tr><td class="n">1</td><td><code>[0, 1, 0, 1, 0]</code></td><td class="n">6</td><td><code>[0, 1, 0, 1, 1]</code></td><td class="n">10</td></tr>
+      <tr><td class="n">2</td><td><code>[0, 1, 0, 1, 1]</code></td><td class="n">10</td><td>nenhum é melhor</td><td class="n">—</td></tr>
+    </tbody>
+  </table></div>
+  <p>Em dois passos o programa saiu de 6 e chegou a 10. Ele parou porque, a partir de <code>[0, 1, 0, 1, 1]</code>, todo vizinho é pior ou inválido.</p>
+
+  <h3><span class="py">Em Python</span><span class="jv">Em Java</span></h3>
+  <pre class="py">def busca_local(resposta):
+    while True:
+        atual = nota(resposta)
+        vizinho, nota_vizinho = melhor_vizinho(resposta)
+
+        if nota_vizinho &lt;= atual:   <span class="cm"># ninguém melhora: acabou</span>
+            return resposta, atual
+
+        resposta = vizinho          <span class="cm"># senão, anda e tenta de novo</span>
+
+print(busca_local([0, 1, 0, 1, 0]))   <span class="cm"># ([0, 1, 0, 1, 1], 10)</span></pre>
+<pre class="jv">static int[] buscaLocal(int[] resposta) {
+    while (true) {
+        int atual = nota(resposta);
+        int[] vizinho = melhorVizinho(resposta);
+
+        if (nota(vizinho) &lt;= atual) {    <span class="cm">// ninguém melhora: acabou</span>
+            return resposta;
+        }
+        resposta = vizinho;              <span class="cm">// senão, anda e tenta de novo</span>
+    }
+}
+
+int[] r = buscaLocal(new int[]{0, 1, 0, 1, 0});
+System.out.println(Arrays.toString(r) + " " + nota(r));
+<span class="cm">// [0, 1, 0, 1, 1] 10</span></pre>
+
+  <div class="ex">
+    <h4>Exercícios da parte 4</h4>
+    <p style="margin:-4px 0 18px;font-size:14.5px;color:var(--muted);border-left:2px solid var(--line-strong);padding-left:12px">
+      Lembrete dos dados: pesos <strong>4, 5, 7, 9, 6</strong> &middot; utilidades <strong>2, 2, 3, 4, 4</strong> &middot; a mochila aguenta <strong>23&nbsp;kg</strong>.
+    </p>
+    <ol>
+      <li>Rode a busca local no papel a partir de <code>[0, 0, 0, 0, 0]</code>, ou seja, com a mochila vazia. Onde ela para?
+        <div class="alts" data-c="c">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">Na nota 4</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">Na nota 8</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">Na nota 11</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">Na nota 10</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q14"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div>
+        <p>O caminho tem três passos:</p>
+        <p><code>[0,0,0,0,0]</code> nota 0 → <code>[0,0,0,1,0]</code> nota 4 → <code>[0,0,0,1,1]</code> nota 8 → <code>[0,0,1,1,1]</code> nota 11, e aí ela para. Chegou na melhor resposta possível.</p>
+        <p>Um detalhe do primeiro passo: colocar o item 4 e colocar o item 5 dão nota 4 nos dois casos, ou seja, deu empate. O programa da parte 4 fica com o primeiro que ele encontrou, que é o item 4, porque a comparação dele é <code>&gt;</code> e não <code>&gt;=</code>. Se você tivesse escolhido o item 5 no papel, chegaria em 11 do mesmo jeito, só que por outro caminho.</p>
+        </div></details>
+      </li>
+      <li>Rode a busca local a partir de <code>[1, 1, 0, 0, 0]</code>. Ela chega a 11?
+        <div class="alts" data-c="d">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">Não: ela para na nota 4</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">Sim, ela chega a 11</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">Não: ela para na nota 10</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">Não: ela para na nota 8</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q15"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div>
+        <p>De <code>[1,1,0,0,0]</code>, peso 9 e nota 4, o melhor vizinho é <code>[1,1,0,1,0]</code>, com nota 8 e peso 18. De lá em diante nada melhora: colocar o item 3 daria 25 kg (inválido), colocar o item 5 daria 24 kg (inválido), e tirar qualquer coisa piora. Ela para em <strong>8</strong>, e não chegou a 11.</p>
+        <p>Vale olhar por que ela travou. No primeiro passo houve um empate: colocar o item 4 dava nota 8, e colocar o item 5 <em>também</em> dava nota 8. O programa ficou com o item 4 e travou ali. Se tivesse ficado com o item 5, a resposta seria <code>[1,1,0,0,1]</code>, com 15 kg, de onde ainda cabia o item 3 e daria para chegar a <strong>11</strong>. Um empate resolvido de outro jeito mudaria o resultado final inteiro.</p>
+        <p>Guarde essas duas observações. Elas são exatamente o assunto da próxima parte.</p>
+        </div></details>
+      </li>
+      <li>Modifique o programa para imprimir a nota a cada passo, e observe a subida acontecendo.
+        <div class="aberta"><button type="button" class="destrava">Já tentei, quero ver a resposta</button></div>
+        <details class="trava" data-q="q16"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div>
+        <pre class="py">def busca_local(resposta, mostrar=False):
+    passo = 0
+    while True:
+        atual = nota(resposta)
+        if mostrar:
+            print("passo", passo, resposta, "nota", atual)
+        vizinho, nota_vizinho = melhor_vizinho(resposta)
+        if nota_vizinho &lt;= atual:
+            return resposta, atual
+        resposta = vizinho
+        passo = passo + 1</pre>
+<pre class="jv">static int[] buscaLocal(int[] resposta, boolean mostrar) {
+    int passo = 0;
+    while (true) {
+        int atual = nota(resposta);
+        if (mostrar) {
+            System.out.println("passo " + passo + " "
+                + Arrays.toString(resposta) + " nota " + atual);
+        }
+        int[] vizinho = melhorVizinho(resposta);
+        if (nota(vizinho) &lt;= atual) {
+            return resposta;
+        }
+        resposta = vizinho;
+        passo = passo + 1;
+    }
+}</pre>
+        </div></details>
+      </li>
+      <li>Por que o programa usa <span class="py"><code>while True</code></span><span class="jv"><code>while (true)</code></span> em vez de um <code>for</code> com número fixo de repetições?
+        <div class="alts" data-c="b">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">Porque o <code>while</code> é mais rápido do que o <code>for</code></span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">Porque não se sabe quantos passos serão necessários</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">Porque o <code>for</code> não funciona com listas de tamanho fixo</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">Porque o <code>while</code> impede a busca de cair em ótimo local</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q17"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div><p>Porque não dá para saber de antemão quantos passos serão necessários. Depende de onde a busca começou e do formato do problema. O <code>while</code> continua enquanto houver melhora e para sozinho quando não houver. Um <code>for</code> fixo pararia cedo demais em alguns casos e desperdiçaria voltas em outros.</p></div></details>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section id="p5">
+  <div class="num">PARTE 5</div>
+  <h2>O vale errado</h2>
+  <p class="lede">A busca local tem um defeito grave, e entender esse defeito é o coração da matéria.</p>
+
+  <p>Volte à imagem da montanha no escuro. Você desce, desce, e chega num ponto em que todos os lados sobem. Você parou. Mas será que você chegou ao ponto mais baixo da montanha inteira, ou só ao fundo de uma covinha no meio do caminho?</p>
+
+  <p>No escuro, você não tem como saber. E é exatamente isso que acontece com o computador.</p>
+
+  <figure>
+    <svg viewBox="0 0 640 250" width="100%" role="img" aria-label="Desenho de uma paisagem com vários vales; três vales rasos e um vale mais fundo no meio">
+      <path d="M20,120 L55,175 L90,115 L125,168 L170,192 L215,95 L255,132 L310,210 L355,120 L395,182 L440,128 L485,196 L530,138 L575,186 L620,142 L620,232 L20,232 Z" fill="var(--pine-soft)" stroke="none"/>
+      <polyline points="20,120 55,175 90,115 125,168 170,192 215,95 255,132 310,210 355,120 395,182 440,128 485,196 530,138 575,186 620,142" fill="none" stroke="var(--pine)" stroke-width="2" stroke-linejoin="round"/>
+      <line x1="20" y1="232" x2="626" y2="232" stroke="var(--line-strong)" stroke-width="1"/>
+      <circle cx="55" cy="175" r="4.5" fill="var(--ember)"/>
+      <circle cx="170" cy="192" r="4.5" fill="var(--ember)"/>
+      <circle cx="485" cy="196" r="4.5" fill="var(--ember)"/>
+      <text x="60" y="163" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="var(--ember)">vale raso</text>
+      <text x="380" y="212" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="var(--ember)">vale raso</text>
+      <circle cx="310" cy="210" r="6" fill="var(--pine)"/>
+      <text x="248" y="228" font-family="IBM Plex Mono, monospace" font-size="12" fill="var(--pine)" font-weight="600">o vale mais fundo</text>
+    </svg>
+    <figcaption>A busca local para no primeiro vale que encontra. Se ela começou do lado esquerdo, nunca vai descobrir que existe um vale melhor no meio.</figcaption>
+  </figure>
+
+  <p>Esses vales rasos têm um nome que você vai ver em todo lugar: <strong>ótimo local</strong>. É uma resposta que é a melhor <em>perto dela</em>, mas não é a melhor de todas. A melhor de todas se chama <strong>ótimo global</strong>.</p>
+
+  <p>Foi exatamente isso que aconteceu no exercício 2 da parte anterior: começando em <code>[1, 1, 0, 0, 0]</code>, a busca local ficou presa na nota 8, enquanto existe uma resposta com nota 11.</p>
+
+  <div class="box">
+    <div class="t">Guarde esta frase</div>
+    <p>Onde a busca local termina depende de onde ela começou. Rodar o mesmo programa duas vezes, a partir de pontos diferentes, pode dar respostas diferentes. Isso não é bug: é a natureza do método.</p>
+  </div>
+
+  <h3>Uma experiência que vale fazer</h3>
+  <p>Como a mochila tem só 5 itens, existem apenas 32 pontos de partida possíveis. Dá para testar <em>todos</em> eles e ver onde a busca local para em cada caso:</p>
+  <pre class="py">from itertools import product
+
+resultados = []
+for inicio in product([0, 1], repeat=5):
+    resposta, valor = busca_local(list(inicio))
+    resultados.append(valor)
+
+for v in [8, 9, 10, 11]:
+    print("parou em", v, ":", resultados.count(v), "vezes")</pre>
+<pre class="jv">int[] contagem = new int[12];    <span class="cm">// uma posição para cada nota possível</span>
+
+for (int mascara = 0; mascara &lt; 32; mascara++) {
+    int[] inicio = new int[5];
+    for (int i = 0; i &lt; 5; i++) {
+        inicio[i] = (mascara &gt;&gt; i) % 2;
+    }
+    int[] resposta = buscaLocal(inicio);
+    contagem[nota(resposta)] = contagem[nota(resposta)] + 1;
+}
+
+for (int v = 8; v &lt;= 11; v++) {
+    System.out.println("parou em " + v + " : " + contagem[v] + " vezes");
+}</pre>
+
+  <p>O resultado é este:</p>
+
+  <div class="tbl"><table>
+    <thead><tr><th>A busca local parou em</th><th class="n">Quantos pontos de partida</th><th>O que isso é</th></tr></thead>
+    <tbody>
+      <tr><td>nota 11</td><td class="n">16 de 32</td><td>o vale mais fundo</td></tr>
+      <tr><td>nota 10</td><td class="n">9 de 32</td><td>vale raso</td></tr>
+      <tr><td>nota 9</td><td class="n">5 de 32</td><td>vale raso</td></tr>
+      <tr><td>nota 8</td><td class="n">2 de 32</td><td>vale raso</td></tr>
+    </tbody>
+  </table></div>
+
+  <p>Ou seja: <strong>metade dos pontos de partida leva à melhor resposta, e a outra metade não.</strong> E existem três vales rasos diferentes onde ela pode encalhar.</p>
+
+  <p>Isso numa mochila com 5 itens, que é o problema mais simples que dá para inventar. Em problemas de tamanho real, a chance de cair no vale certo por acaso é muito menor. Descobrir como escapar dos vales rasos é o assunto da próxima parte, e é praticamente a área inteira.</p>
+
+  <div class="ex">
+    <h4>Exercícios da parte 5</h4>
+    <p style="margin:-4px 0 18px;font-size:14.5px;color:var(--muted);border-left:2px solid var(--line-strong);padding-left:12px">
+      Lembrete dos dados: pesos <strong>4, 5, 7, 9, 6</strong> &middot; utilidades <strong>2, 2, 3, 4, 4</strong> &middot; a mochila aguenta <strong>23&nbsp;kg</strong>.
+    </p>
+    <ol>
+      <li>Explique com suas palavras a diferença entre ótimo local e ótimo global.
+        <div class="alts" data-c="c">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">Todo ótimo local é também um ótimo global</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">Os dois são a mesma coisa, muda só o nome</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">Todo ótimo global é também um ótimo local</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">Todo problema tem exatamente um ótimo local</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q18"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div><p>Ótimo local é uma resposta que não tem nenhum vizinho melhor: olhando só em volta, ela parece ser a melhor. Ótimo global é a melhor resposta de todas as que existem. Todo ótimo global é também ótimo local, mas o contrário não vale: existem muitos vales rasos e normalmente só um vale mais fundo.</p></div></details>
+      </li>
+      <li>Modifique o programa da experiência para imprimir <em>quais</em> pontos de partida levam à nota 8, que é o pior resultado possível. <strong>Quantos pontos de partida terminam nessa nota?</strong>
+        <div class="alts" data-c="c">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">16 dos 32</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">8 dos 32</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">2 dos 32</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">Nenhum</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q19"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div>
+        <p>São exatamente dois: <code>[1,1,0,0,0]</code> e <code>[1,1,0,1,0]</code>. Faz sentido, porque os dois já começam com os itens 1 e 2 dentro da mochila, que são justamente os dois piores itens (utilidade 2 cada). Com eles ocupando espaço, não sobra peso para os bons.</p>
+        <pre class="py">for inicio in product([0, 1], repeat=5):
+    resposta, valor = busca_local(list(inicio))
+    if valor == 8:
+        print(list(inicio), "termina em", resposta)</pre>
+<pre class="jv">for (int mascara = 0; mascara &lt; 32; mascara++) {
+    int[] inicio = new int[5];
+    for (int i = 0; i &lt; 5; i++) {
+        inicio[i] = (mascara &gt;&gt; i) % 2;
+    }
+    int[] resposta = buscaLocal(inicio);
+    if (nota(resposta) == 8) {
+        System.out.println(Arrays.toString(inicio)
+            + " termina em " + Arrays.toString(resposta));
+    }
+}</pre>
+        <p>Isso mostra uma coisa importante: não é azar aleatório. Certos pontos de partida <em>sempre</em> levam a um resultado ruim, e o programa não tem como perceber isso sozinho.</p>
+        </div></details>
+      </li>
+      <li>No desenho da paisagem, três vales rasos estão marcados com bolinha laranja, mas existem outros sem marcação. Conte todos os pontos em que a linha desce e volta a subir. Quantos vales existem no desenho inteiro, incluindo o mais fundo?
+        <div class="alts" data-c="d">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">1 vale</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">3 vales</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">5 vales</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">6 vales</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q20"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div><p>Seis vales: cinco rasos e o mais fundo, que está no meio e é o único marcado em verde. Se você soltar a busca local em um ponto qualquer do desenho, ela vai escorregar até o vale mais próximo dali e parar. Só um desses seis é a resposta certa, e ela não tem como saber em qual caiu.</p></div></details>
+      </li>
+      <li>Uma amiga diz: "meu programa achou a melhor resposta possível". Que pergunta você faria para ela?
+        <div class="alts" data-c="b">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">"Quantos itens o seu problema tinha ao todo?"</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">"Como você sabe que não existe uma melhor?"</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">"Que linguagem de programação você usou?"</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">"Quanto tempo o seu programa levou rodando?"</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q21"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div><p>Como ela sabe? Achar uma resposta boa e provar que ela é a melhor de todas são coisas muito diferentes. Sem testar tudo, ou sem uma prova matemática, o correto é dizer "a melhor resposta que eu encontrei". Essa distinção parece detalhe, mas é uma das marcas de quem entende a área.</p></div></details>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section id="p6">
+  <div class="num">PARTE 6</div>
+  <h2>Quatro jeitos de sair do vale errado</h2>
+  <p class="lede">Todas as técnicas famosas da área são respostas para a mesma pergunta: a busca local parou cedo demais, e agora?</p>
+
+  <h3>Jeito 1: tentar de novo, de outro lugar</h3>
+  <p>O mais simples de todos. Rode a busca local várias vezes, cada vez começando de um ponto sorteado, e fique com a melhor resposta que apareceu.</p>
+  <pre class="py">import random
+
+def varias_tentativas(quantas):
+    melhor = None
+    melhor_nota = -1
+    for t in range(quantas):
+        inicio = [random.randint(0, 1) for i in range(5)]
+        resposta, valor = busca_local(inicio)
+        if valor &gt; melhor_nota:
+            melhor = resposta
+            melhor_nota = valor
+    return melhor, melhor_nota
+
+print(varias_tentativas(50))</pre>
+<pre class="jv">import java.util.Random;
+
+static Random sorteio = new Random();
+
+static int[] variasTentativas(int quantas) {
+    int[] melhor = null;
+    int melhorNota = -1;
+    for (int t = 0; t &lt; quantas; t++) {
+        int[] inicio = new int[5];
+        for (int i = 0; i &lt; 5; i++) {
+            inicio[i] = sorteio.nextInt(2);    <span class="cm">// sorteia 0 ou 1</span>
+        }
+        int[] resposta = buscaLocal(inicio);
+        if (nota(resposta) &gt; melhorNota) {
+            melhor = resposta;
+            melhorNota = nota(resposta);
+        }
+    }
+    return melhor;
+}
+
+int[] r = variasTentativas(50);
+System.out.println(Arrays.toString(r) + " " + nota(r));</pre>
+  <p><strong>Ponto forte:</strong> fácil de escrever, funciona razoavelmente. <strong>Ponto fraco:</strong> cada tentativa começa do zero e joga fora tudo o que foi aprendido antes.</p>
+
+  <h3>Jeito 2: aceitar piorar de vez em quando</h3>
+  <p>Se você está no fundo de um vale raso, a única saída é subir um pouco antes de descer de novo. Então: em vez de aceitar só melhorias, aceite às vezes uma resposta pior, de propósito.</p>
+  <p>Mas quantas vezes? A ideia esperta é usar um número que vai diminuindo com o tempo, chamado de <strong>temperatura</strong>. No começo, a temperatura é alta e o programa aceita quase qualquer coisa (está explorando). Perto do fim, a temperatura é baixa e ele só aceita melhorias (está afinando a resposta).</p>
+  <p>A conta da chance de aceitar uma piora é esta:</p>
+  <pre>chance = 2,718 elevado a (−piora / temperatura)</pre>
+  <p>Não precisa decorar. Mexa no controle abaixo para ver o que ela faz:</p>
+
+  <div class="lab">
+    <div class="row">
+      <label for="temp">Temperatura</label>
+      <input id="temp" type="range" min="0.5" max="40" step="0.5" value="14">
+      <output id="tval">14</output>
+    </div>
+    <div class="bars">
+      <div class="bar"><span class="lbl">piora pequena</span><span class="track"><span class="fill" id="b1"></span></span><span class="val" id="v1"></span></div>
+      <div class="bar"><span class="lbl">piora média</span><span class="track"><span class="fill" id="b2"></span></span><span class="val" id="v2"></span></div>
+      <div class="bar"><span class="lbl">piora grande</span><span class="track"><span class="fill" id="b3"></span></span><span class="val" id="v3"></span></div>
+    </div>
+    <p style="margin:16px 0 0;font-size:14.5px;color:var(--muted)">Arraste a temperatura para baixo. Repare que as pioras grandes deixam de ser aceitas primeiro, e as pequenas resistem mais um pouco. É assim que o programa vai deixando de explorar e começando a se concentrar.</p>
+  </div>
+
+  <p>Esse método se chama <strong>recozimento simulado</strong> (em inglês, <em>simulated annealing</em>). O nome vem da metalurgia: metal quente resfriado devagar fica mais bem formado do que metal resfriado de repente.</p>
+
+  <h3>Jeito 3: proibir voltar por onde veio</h3>
+  <p>Outro caminho: sempre vá para o melhor vizinho, mesmo que ele seja pior que onde você está. Só que aí surge um problema imediato: você piora, e no passo seguinte o melhor vizinho é voltar para onde você estava. O programa fica indo e voltando para sempre.</p>
+  <p>A solução é manter uma <strong>lista de proibições</strong>: as últimas mudanças feitas ficam bloqueadas por algumas rodadas. Assim o programa é obrigado a seguir em frente.</p>
+  <p>Esse método se chama <strong>busca tabu</strong>. "Tabu" aqui quer dizer proibido mesmo.</p>
+  <div class="box">
+    <div class="t">Detalhe importante</div>
+    <p>Como a resposta atual pode piorar, o programa guarda em separado uma cópia da <em>melhor resposta já vista</em>. No fim, ele devolve essa cópia, não a resposta em que parou. Esquecer isso é o erro mais comum de quem implementa busca tabu pela primeira vez.</p>
+  </div>
+
+  <h3>Jeito 4: chacoalhar e descer de novo</h3>
+  <p>Este é o mais elegante. Quando a busca local parar, não jogue a resposta fora e não comece do zero. Em vez disso, <strong>bagunce um pouquinho</strong> a resposta encontrada (troque 2 ou 3 itens de uma vez só) e rode a busca local de novo a partir daí.</p>
+  <p>Se a nova resposta for melhor, continue dela. Se for pior, volte para a anterior e chacoalhe de novo.</p>
+  <pre><span class="kw">Busca local repetida</span>
+
+1. Rode a busca local uma vez. Guarde o resultado.
+2. Repita muitas vezes:
+       a) chacoalhe a resposta atual
+       b) rode a busca local a partir da bagunça
+       c) se ficou melhor, adote a nova resposta
+3. Devolva a melhor resposta que já apareceu</pre>
+  <p>A sacada é que o chacoalhão preserva a maior parte do que já estava bom, e mexe só o suficiente para sair do vale. Comparado a começar do zero, é muito mais eficiente.</p>
+  <p>Esse método se chama <strong>busca local iterada</strong> (em inglês, <em>iterated local search</em>, ou ILS). É o tema do segundo PDF que você tem.</p>
+
+  <h3>Comparando os quatro</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Jeito</th><th>Como escapa do vale</th><th>Dificuldade de programar</th></tr></thead>
+    <tbody>
+      <tr><td>Tentar de novo</td><td>Sorteia outro ponto de partida</td><td>Muito fácil</td></tr>
+      <tr><td>Recozimento simulado</td><td>Aceita piorar, com chance que diminui</td><td>Fácil</td></tr>
+      <tr><td>Busca tabu</td><td>Proíbe desfazer as últimas mudanças</td><td>Média</td></tr>
+      <tr><td>Busca local iterada</td><td>Bagunça um pouco e desce de novo</td><td>Fácil</td></tr>
+    </tbody>
+  </table></div>
+
+  <p>Todos esses métodos têm um nome coletivo: <strong>metaheurísticas</strong>. Palavra feia, ideia simples. São receitas gerais para procurar bem, que funcionam em qualquer problema, desde que você forneça as três peças da parte 2 (representação, nota e restrições) e diga o que é um vizinho.</p>
+
+  <div class="ex">
+    <h4>Exercícios da parte 6</h4>
+    <p style="margin:-4px 0 18px;font-size:14.5px;color:var(--muted);border-left:2px solid var(--line-strong);padding-left:12px">
+      Lembrete dos dados: pesos <strong>4, 5, 7, 9, 6</strong> &middot; utilidades <strong>2, 2, 3, 4, 4</strong> &middot; a mochila aguenta <strong>23&nbsp;kg</strong>.
+    </p>
+    <ol>
+      <li>No controle de temperatura, o que acontece com as três barras quando a temperatura chega perto de zero? O que o programa vira nesse momento?
+        <div class="alts" data-c="a">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">Ele vira a mesma busca local da parte 4</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">Ele passa a aceitar qualquer piora sorteada</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">O programa trava e nunca chega ao fim</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">Ele passa a aceitar só as pioras grandes</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q22"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div><p>As três chances vão para perto de zero, ou seja, nenhuma piora é mais aceita. O programa vira exatamente a busca local da parte 4. É por isso que o recozimento simulado é descrito como "uma busca local que começa bagunçada e vai ficando comportada".</p></div></details>
+      </li>
+      <li>Por que o método "tentar de novo" desperdiça esforço?
+        <div class="alts" data-c="c">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">Porque sortear números é bem devagar</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">Porque gasta memória demais a cada volta</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">Porque cada tentativa começa tudo do zero</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">Porque ele não usa a ideia de vizinhança</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q23"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div><p>Porque a tentativa 30 não aproveita nada do que as 29 anteriores descobriram. Cada uma começa de um ponto sorteado, sem memória. A busca local iterada corrige justamente isso: ela parte sempre de uma resposta boa já encontrada e só a modifica um pouco.</p></div></details>
+      </li>
+      <li>Na busca tabu, o que aconteceria se a lista de proibições ficasse vazia?
+        <div class="alts" data-c="b">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">O programa fica mais rápido e continua bem</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">O programa fica indo e voltando para sempre</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">O programa para logo na primeira rodada</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">O programa vira um recozimento simulado</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q24"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div><p>O programa entraria em um ciclo infinito de ir e voltar: sai do vale para o vizinho menos ruim, e no passo seguinte o melhor vizinho é justamente voltar para o vale. A lista existe exatamente para impedir esse vaivém.</p></div></details>
+      </li>
+      <li>Implemente o jeito 4 (chacoalhar) para a mochila. Use "trocar 2 itens sorteados" como chacoalhão.
+        <div class="aberta"><button type="button" class="destrava">Já tentei, quero ver a resposta</button></div>
+        <details class="trava" data-q="q25"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div>
+        <pre class="py">import random
+
+def chacoalha(resposta, quantos=2):
+    nova = resposta.copy()
+    posicoes = random.sample(range(len(resposta)), quantos)
+    for i in posicoes:
+        nova[i] = 1 - nova[i]
+    return nova
+
+def busca_local_iterada(rodadas=100):
+    atual, valor = busca_local([random.randint(0,1) for i in range(5)])
+    melhor, melhor_nota = atual, valor
+
+    for r in range(rodadas):
+        bagunca = chacoalha(atual)
+        nova, nova_nota = busca_local(bagunca)
+
+        if nova_nota &gt; valor:        <span class="cm"># melhorou: continua daqui</span>
+            atual, valor = nova, nova_nota
+
+        if nova_nota &gt; melhor_nota:  <span class="cm"># guarda a melhor de todas</span>
+            melhor, melhor_nota = nova, nova_nota
+
+    return melhor, melhor_nota
+
+print(busca_local_iterada())</pre>
+<pre class="jv"><span class="cm">// troca o valor de dois itens sorteados, sempre em posições diferentes</span>
+static int[] chacoalha(int[] resposta) {
+    int[] nova = resposta.clone();
+    int i = sorteio.nextInt(nova.length);
+    int j = sorteio.nextInt(nova.length);
+    while (j == i) {
+        j = sorteio.nextInt(nova.length);
+    }
+    nova[i] = 1 - nova[i];
+    nova[j] = 1 - nova[j];
+    return nova;
+}
+
+static int[] buscaLocalIterada(int rodadas) {
+    int[] inicio = new int[5];
+    for (int i = 0; i &lt; 5; i++) {
+        inicio[i] = sorteio.nextInt(2);
+    }
+    int[] atual = buscaLocal(inicio);
+    int[] melhor = atual;
+
+    for (int r = 0; r &lt; rodadas; r++) {
+        int[] nova = buscaLocal(chacoalha(atual));
+
+        if (nota(nova) &gt; nota(atual)) {     <span class="cm">// melhorou: continua daqui</span>
+            atual = nova;
+        }
+        if (nota(nova) &gt; nota(melhor)) {    <span class="cm">// guarda a melhor de todas</span>
+            melhor = nova;
+        }
+    }
+    return melhor;
+}</pre>
+        <p>Repare nas duas comparações separadas: uma decide de onde continuar, a outra guarda o recorde. São coisas diferentes.</p>
+        </div></details>
+      </li>
+      <li>Compare "tentar de novo 100 vezes" com "chacoalhar 100 vezes" nesta mochila de 5 itens. Você vai ver que os dois acertam quase sempre. <strong>Por que isso acontece?</strong>
+        <div class="alts" data-c="a">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">Porque metade das partidas já chega a 11 sozinha</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">Porque a busca local nunca erra em problemas pequenos</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">Porque esta mochila só tem uma resposta possível</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">Porque 100 tentativas é o número exato para acertar</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q26"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div>
+        <p>Nesta mochila os dois acertam praticamente sempre, e dá para entender por quê: você viu na parte 5 que metade dos pontos de partida já leva à nota 11 sozinha. Com 100 tentativas, a chance de <em>todas</em> darem errado é perto de zero. O problema é pequeno demais para separar um método do outro.</p>
+        <p>Para ver a diferença de verdade, gere uma mochila com 30 itens de pesos e utilidades sorteados e repita a comparação. Aí a versão que chacoalha costuma ganhar, porque cada tentativa dela parte de uma resposta que já era boa, em vez de começar do zero.</p>
+        </div></details>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section id="p7">
+  <div class="num">PARTE 7</div>
+  <h2>Um exemplo com mapa: o entregador</h2>
+  <p class="lede">Até agora a resposta era uma lista de 0 e 1. Vamos ver um problema em que a resposta é uma ordem, para você perceber que a ideia continua exatamente a mesma.</p>
+
+  <p>Um entregador precisa sair da loja, passar por 5 endereços e voltar. Ele quer o percurso mais curto. Essas são as distâncias, em quilômetros, entre cada par de pontos:</p>
+
+  <div class="tbl"><table>
+    <thead><tr><th>de \ para</th><th class="n">1</th><th class="n">2</th><th class="n">3</th><th class="n">4</th><th class="n">5</th><th class="n">6</th></tr></thead>
+    <tbody>
+      <tr><td><strong>1</strong></td><td class="n">0</td><td class="n">2</td><td class="n">1</td><td class="n">4</td><td class="n">9</td><td class="n">1</td></tr>
+      <tr><td><strong>2</strong></td><td class="n">2</td><td class="n">0</td><td class="n">5</td><td class="n">9</td><td class="n">7</td><td class="n">2</td></tr>
+      <tr><td><strong>3</strong></td><td class="n">1</td><td class="n">5</td><td class="n">0</td><td class="n">3</td><td class="n">8</td><td class="n">6</td></tr>
+      <tr><td><strong>4</strong></td><td class="n">4</td><td class="n">9</td><td class="n">3</td><td class="n">0</td><td class="n">2</td><td class="n">5</td></tr>
+      <tr><td><strong>5</strong></td><td class="n">9</td><td class="n">7</td><td class="n">8</td><td class="n">2</td><td class="n">0</td><td class="n">2</td></tr>
+      <tr><td><strong>6</strong></td><td class="n">1</td><td class="n">2</td><td class="n">6</td><td class="n">5</td><td class="n">2</td><td class="n">0</td></tr>
+    </tbody>
+  </table></div>
+
+  <p>Este é o famoso <strong>problema do caixeiro viajante</strong>, provavelmente o problema de otimização mais conhecido que existe.</p>
+
+  <h3>As três peças, de novo</h3>
+  <ul>
+    <li><strong>Representação:</strong> a ordem de visita, como <code>[1, 3, 4, 5, 6, 2]</code>. Note que agora não é 0 e 1: é uma ordem, e cada ponto aparece exatamente uma vez. <span class="py">Em Python continua sendo uma lista.</span><span class="jv">Em Java continua sendo um vetor de <code>int</code>.</span></li>
+    <li><strong>Função objetivo:</strong> soma das distâncias do caminho, incluindo a volta para o ponto de partida. Aqui queremos <em>minimizar</em>.</li>
+    <li><strong>Restrição:</strong> passar por todos os pontos, uma vez cada.</li>
+  </ul>
+
+  <p>Para a ordem <code>[1, 3, 4, 5, 6, 2]</code>: 1 + 3 + 2 + 2 + 2 + 2 = <strong>12 km</strong>.</p>
+
+  <h3>Uma primeira resposta, sem esforço</h3>
+  <p>Comece na loja e, a cada parada, vá para o endereço mais perto que você ainda não visitou. Partindo do ponto 1:</p>
+  <ol>
+    <li>Do 1, o mais perto é o 3 (1 km). Vai para o 3.</li>
+    <li>Do 3, entre os que faltam, o mais perto é o 4 (3 km).</li>
+    <li>Do 4, o mais perto é o 5 (2 km).</li>
+    <li>Do 5, o mais perto é o 6 (2 km).</li>
+    <li>Só sobrou o 2 (2 km).</li>
+    <li>Volta do 2 para o 1 (2 km).</li>
+  </ol>
+  <p>Resultado: <code>[1, 3, 4, 5, 6, 2]</code>, com 12 km. Simples assim. Esse tipo de regra "pegue sempre o melhor agora" se chama <strong>heurística gulosa</strong>, e é uma forma rápida de conseguir uma resposta inicial decente.</p>
+
+  <h3>O que é um vizinho aqui?</h3>
+  <p>Não dá para trocar 0 por 1, porque a resposta não é feita de 0 e 1. Mas a ideia de "mudar um pouquinho" continua valendo: <strong>trocar dois endereços de posição</strong>.</p>
+  <p>Por exemplo, trocando o 3 e o 5 em <code>[1, 3, 4, 5, 6, 2]</code>, você obtém <code>[1, 5, 4, 3, 6, 2]</code>. É um vizinho.</p>
+  <p>Com 6 pontos existem 15 trocas possíveis, então cada resposta tem 15 vizinhos. E, com isso definido, <strong>todos os métodos das partes 4, 5 e 6 funcionam sem mudar nada da lógica.</strong> Só muda a peça "o que é um vizinho".</p>
+
+  <h3><span class="py">Em Python</span><span class="jv">Em Java</span></h3>
+  <pre class="py">distancias = [
+    [0, 2, 1, 4, 9, 1],
+    [2, 0, 5, 9, 7, 2],
+    [1, 5, 0, 3, 8, 6],
+    [4, 9, 3, 0, 2, 5],
+    [9, 7, 8, 2, 0, 2],
+    [1, 2, 6, 5, 2, 0],
+]
+
+def comprimento(rota):
+    total = 0
+    for i in range(len(rota)):
+        origem  = rota[i]
+        destino = rota[(i + 1) % len(rota)]   <span class="cm"># o % faz voltar ao início</span>
+        total = total + distancias[origem][destino]
+    return total
+
+<span class="cm"># atenção: no Python as posições começam em 0,</span>
+<span class="cm"># então o ponto 1 do mapa é o índice 0</span>
+rota = [0, 2, 3, 4, 5, 1]
+print(comprimento(rota))   <span class="cm"># 12</span>
+
+def vizinhos_rota(rota):
+    lista = []
+    for i in range(len(rota)):
+        for j in range(i + 1, len(rota)):
+            v = rota.copy()
+            v[i], v[j] = v[j], v[i]    <span class="cm"># troca os dois de lugar</span>
+            lista.append(v)
+    return lista
+
+print(len(vizinhos_rota(rota)))   <span class="cm"># 15</span></pre>
+<pre class="jv">static int[][] distancias = {
+    {0, 2, 1, 4, 9, 1},
+    {2, 0, 5, 9, 7, 2},
+    {1, 5, 0, 3, 8, 6},
+    {4, 9, 3, 0, 2, 5},
+    {9, 7, 8, 2, 0, 2},
+    {1, 2, 6, 5, 2, 0},
+};
+
+static int comprimento(int[] rota) {
+    int total = 0;
+    for (int i = 0; i &lt; rota.length; i++) {
+        int origem  = rota[i];
+        int destino = rota[(i + 1) % rota.length];    <span class="cm">// o % faz voltar ao início</span>
+        total = total + distancias[origem][destino];
+    }
+    return total;
+}
+
+<span class="cm">// atenção: em Java as posições começam em 0,</span>
+<span class="cm">// então o ponto 1 do mapa é o índice 0</span>
+int[] rota = {0, 2, 3, 4, 5, 1};
+System.out.println(comprimento(rota));    <span class="cm">// 12</span>
+
+static int[][] vizinhosRota(int[] rota) {
+    int n = rota.length;
+    int[][] lista = new int[n * (n - 1) / 2][];
+    int k = 0;
+    for (int i = 0; i &lt; n; i++) {
+        for (int j = i + 1; j &lt; n; j++) {
+            int[] v = rota.clone();
+            int guarda = v[i];        <span class="cm">// troca os dois de lugar</span>
+            v[i] = v[j];
+            v[j] = guarda;
+            lista[k] = v;
+            k = k + 1;
+        }
+    }
+    return lista;
+}
+
+System.out.println(vizinhosRota(rota).length);    <span class="cm">// 15</span></pre>
+
+  <div class="ex">
+    <h4>Exercícios da parte 7</h4>
+    <ol>
+      <li>Calcule o comprimento da rota <code>[1, 2, 3, 4, 5, 6]</code>.
+        <div class="alts" data-c="b">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">14 km</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">15 km</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">12 km</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">18 km</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q27"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div><p>2 + 5 + 3 + 2 + 2 + 1 = 15 km. É pior que os 12 km da rota gulosa.</p></div></details>
+      </li>
+      <li>Aplique a regra do "mais perto" começando pelo ponto 5, em vez do 1. O resultado é o mesmo?
+        <div class="alts" data-c="a">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">Não: dá 16 km, um resultado pior</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">Não: dá 10 km, um resultado melhor</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">Não: dá 15 km, um resultado pior</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">Sim: dá 12 km também</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q28"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div><p>Do 5, os mais perto são o 4 e o 6, ambos a 2 km. Pegando o 4: depois vai para o 3 (3 km), depois para o 1 (1 km), depois para o 6 (1 km), depois para o 2 (2 km), e volta do 2 para o 5 (7 km). Total: 2 + 3 + 1 + 1 + 2 + 7 = 16 km. <strong>Bem pior.</strong> A regra gulosa depende de onde você começa, e o último trecho costuma ser caro, porque sobrou o que ninguém quis.</p></div></details>
+      </li>
+      <li>Quantos vizinhos tem uma rota com 10 pontos?
+        <div class="alts" data-c="d">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">10 vizinhos</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">100 vizinhos</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">90 vizinhos</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">45 vizinhos</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q29"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div><p>São todas as escolhas de 2 posições entre 10: 10 × 9 ÷ 2 = 45 vizinhos.</p></div></details>
+      </li>
+      <li>Adapte a busca local da parte 4 para funcionar com rotas. O que precisa mudar?
+        <div class="aberta"><button type="button" class="destrava">Já tentei, quero ver a resposta</button></div>
+        <details class="trava" data-q="q30"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div>
+        <p>Só três coisas: a função de nota vira <code>comprimento</code>, a função de vizinhos vira <code>vizinhos_rota</code>, e as comparações invertem, porque agora queremos o <em>menor</em> valor.</p>
+        <pre class="py">def busca_local_rota(rota):
+    while True:
+        atual = comprimento(rota)
+        melhor = None
+        melhor_valor = atual
+
+        for v in vizinhos_rota(rota):
+            if comprimento(v) &lt; melhor_valor:
+                melhor = v
+                melhor_valor = comprimento(v)
+
+        if melhor is None:      <span class="cm"># ninguém melhorou</span>
+            return rota, atual
+        rota = melhor</pre>
+<pre class="jv">static int[] buscaLocalRota(int[] rota) {
+    while (true) {
+        int atual = comprimento(rota);
+        int[] melhor = null;
+        int melhorValor = atual;
+
+        for (int[] v : vizinhosRota(rota)) {
+            if (comprimento(v) &lt; melhorValor) {
+                melhor = v;
+                melhorValor = comprimento(v);
+            }
+        }
+
+        if (melhor == null) {    <span class="cm">// ninguém melhorou</span>
+            return rota;
+        }
+        rota = melhor;
+    }
+}</pre>
+        </div></details>
+      </li>
+      <li>Com 6 pontos existem 60 rotas realmente diferentes. Com 10 pontos, são 181 440. Com 20 pontos, mais de 60 quatrilhões. O que isso lembra da parte 1?
+        <div class="alts" data-c="d">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">Que o computador precisaria ser mais rápido</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">Que rotas são bem mais fáceis que mochilas</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">Nada: são dois problemas bem diferentes</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">O mesmo: o número de respostas também explode</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q31"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div><p>É o mesmo fenômeno: o número de respostas cresce de um jeito que nenhum computador acompanha. Na mochila o total dobrava a cada item; aqui ele é multiplicado por um número cada vez maior a cada ponto novo. Por isso os dois problemas precisam do mesmo tipo de solução.</p></div></details>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section id="p8">
+  <div class="num">PARTE 8</div>
+  <h2>Como saber se o seu programa é bom</h2>
+  <p class="lede">Estes programas usam sorteio. Isso muda o jeito de testar: uma única execução não prova nada.</p>
+
+  <h3>Rode várias vezes</h3>
+  <p>Se o seu programa sorteia o ponto de partida ou sorteia o chacoalhão, ele vai dar respostas diferentes a cada execução. Rodar uma vez, ver um resultado bom e concluir que o programa é bom é como jogar um dado uma vez e concluir que ele sempre dá 6.</p>
+  <p>O certo é rodar pelo menos umas 20 ou 30 vezes e olhar três números: a <strong>média</strong>, o <strong>melhor</strong> resultado e o <strong>pior</strong>. O pior costuma ser o mais informativo, porque mostra o que acontece quando dá azar.</p>
+
+  <pre class="py">resultados = []
+for tentativa in range(30):
+    resposta, valor = busca_local_iterada()
+    resultados.append(valor)
+
+print("melhor:", max(resultados))
+print("pior:  ", min(resultados))
+print("média: ", sum(resultados) / len(resultados))</pre>
+<pre class="jv">int[] resultados = new int[30];
+for (int tentativa = 0; tentativa &lt; 30; tentativa++) {
+    resultados[tentativa] = nota(buscaLocalIterada(100));
+}
+
+int melhor = resultados[0];
+int pior   = resultados[0];
+int soma   = 0;
+for (int v : resultados) {
+    if (v &gt; melhor) melhor = v;
+    if (v &lt; pior)   pior = v;
+    soma = soma + v;
+}
+
+System.out.println("melhor: " + melhor);
+System.out.println("pior:   " + pior);
+System.out.println("média:  " + (double) soma / resultados.length);</pre>
+
+  <h3>Compare em condições iguais</h3>
+  <p>Se você quer saber se o método A é melhor que o B, os dois precisam receber o mesmo tempo, ou o mesmo número de tentativas, e resolver os mesmos problemas. Comparar um método que rodou 10 segundos com outro que rodou 2 não diz nada.</p>
+
+  <h3>Anote a semente do sorteio</h3>
+  <p>Se você usar <span class="py"><code>random.seed(42)</code></span><span class="jv"><code>new Random(42)</code></span> no começo do programa, o sorteio dá sempre os mesmos números. Isso parece estranho, mas é muito útil: você consegue reproduzir exatamente a mesma execução depois, para investigar um resultado esquisito. Basta lembrar de tirar a semente fixa quando for medir de verdade.</p>
+
+  <div class="box">
+    <div class="t">A pergunta honesta</div>
+    <p>Estes métodos quase nunca provam que acharam a melhor resposta possível. Eles acham uma resposta boa, rápido. Escrever "achei a melhor solução" é errado; escrever "a melhor solução que encontrei em 30 execuções foi X" é correto. Essa diferença de linguagem já mostra que você entendeu o assunto.</p>
+  </div>
+
+  <div class="ex">
+    <h4>Exercícios da parte 8</h4>
+    <ol>
+      <li>Rode a busca local iterada 30 vezes nesta mochila de 5 itens e anote melhor, pior e média. <strong>O que você deve encontrar?</strong>
+        <div class="alts" data-c="b">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">Um erro, porque o programa usa sorteio</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">Sempre 11: melhor, pior e média iguais</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">Sempre 8: melhor, pior e média iguais</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">Valores bem variados entre 8 e 11</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q32"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div><p>Na mochila de 5 itens você deve ver melhor 11, pior 11 e média 11, porque o problema é fácil demais. Isso é um resultado útil: significa que você precisa de um problema maior para conseguir comparar métodos. Gere uma mochila de 30 itens com pesos e utilidades sorteados e repita.</p></div></details>
+      </li>
+      <li>Por que o pior resultado costuma ser mais informativo que o melhor?
+        <div class="alts" data-c="c">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">Porque o pior resultado é o mais comum de todos</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">Porque a média esconde o melhor resultado</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">Porque o melhor resultado pode ter sido sorte</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">Porque o pior é mais fácil de calcular à mão</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q33"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div><p>Porque o melhor resultado pode ter sido sorte. Se você rodar qualquer método bobo mil vezes, alguma execução vai acertar. O pior resultado mostra o que você pode esperar em uma execução comum, que é o que acontece quando o programa roda de verdade, uma vez só.</p></div></details>
+      </li>
+      <li>Duas pessoas comparam métodos. A pessoa A rodou o método dela 1000 vezes e pegou o melhor. A pessoa B rodou o método dela 10 vezes e tirou a média. Qual é o problema?
+        <div class="alts" data-c="b">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">O único problema é que a pessoa A pegou só o melhor</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">Elas gastaram esforços e usaram estatísticas diferentes</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">Não há problema nenhum: as duas mediram o método delas</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">O único problema é que a pessoa B rodou poucas vezes</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q34"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div><p>Elas não mediram a mesma coisa, e nem com o mesmo esforço. A pessoa A gastou 100 vezes mais tempo e ainda reportou o número mais favorável possível. Para a comparação valer, ambas precisam usar o mesmo orçamento de tempo e a mesma estatística: as duas a média de 30 execuções, por exemplo.</p></div></details>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section id="p9">
+  <div class="num">PARTE 9</div>
+  <h2>Mini-projeto</h2>
+  <p class="lede">Junte tudo em um programa só. Se você conseguir fazer este projeto sozinha, entendeu a parte teórica deste caderno.</p>
+
+  <p>Objetivo: escrever um programa <span class="py">em Python</span><span class="jv">em Java</span> que resolve o problema do entregador para um mapa qualquer, usando busca local iterada.</p>
+
+  <h4>Passo 1: gerar um mapa</h4>
+  <p>Sorteie 12 pontos com coordenadas x e y entre 0 e 100, e calcule a distância entre cada par usando o teorema de Pitágoras. Assim você não depende de uma tabela pronta.</p>
+  <pre class="py">import random, math
+
+random.seed(1)     <span class="cm"># tira depois, quando for medir</span>
+N = 12
+pontos = [(random.uniform(0,100), random.uniform(0,100)) for i in range(N)]
+
+def distancia(a, b):
+    dx = pontos[a][0] - pontos[b][0]
+    dy = pontos[a][1] - pontos[b][1]
+    return math.sqrt(dx*dx + dy*dy)</pre>
+<pre class="jv">import java.util.Random;
+
+<span class="cm">// tire a semente depois, quando for medir de verdade</span>
+static Random sorteio = new Random(1);
+static final int N = 12;
+static double[][] pontos = new double[N][2];
+
+static void gerarPontos() {
+    for (int i = 0; i &lt; N; i++) {
+        pontos[i][0] = sorteio.nextDouble() * 100;
+        pontos[i][1] = sorteio.nextDouble() * 100;
+    }
+}
+
+static double distancia(int a, int b) {
+    double dx = pontos[a][0] - pontos[b][0];
+    double dy = pontos[a][1] - pontos[b][1];
+    return Math.sqrt(dx * dx + dy * dy);
+}</pre>
+
+  <h4>Passo 2: função objetivo</h4>
+  <p>Escreva <code>comprimento(rota)</code> somando as distâncias, sem esquecer a volta ao ponto inicial.</p>
+
+  <h4>Passo 3: resposta inicial</h4>
+  <p>Use a regra do "mais perto ainda não visitado", partindo do ponto 0.</p>
+
+  <h4>Passo 4: busca local</h4>
+  <p>Use trocas de duas posições, como na parte 7.</p>
+
+  <h4>Passo 5: chacoalhão e repetição</h4>
+  <p>Faça 3 trocas aleatórias de uma vez só e rode a busca local de novo. Repita 200 vezes.</p>
+
+  <h4>Passo 6: medir</h4>
+  <p>Rode 20 vezes e anote melhor, pior e média. Compare com o resultado da resposta inicial sozinha, sem nenhuma melhoria.</p>
+
+  <div class="box">
+    <div class="t">Perguntas para o seu relatório</div>
+    <p>Quanto a busca local melhorou em relação à rota gulosa inicial? Quanto o chacoalhão melhorou em relação à busca local sozinha? O que acontece se o chacoalhão fizer 8 trocas em vez de 3? E se fizer 1 só?</p>
+  </div>
+
+  <div class="ex">
+    <h4>Se quiser ir além</h4>
+    <ol>
+      <li><span class="py">Desenhe a rota com <code>matplotlib</code>, antes e depois da otimização.</span><span class="jv">Desenhe a rota, antes e depois da otimização, gerando um arquivo SVG com <code>PrintWriter</code> e abrindo no navegador.</span> Ver o desenho melhorar é a melhor forma de entender o que o programa faz.</li>
+      <li>Aumente para 50 pontos e veja quanto tempo cada parte leva.</li>
+      <li>Implemente também o recozimento simulado e compare os dois métodos com o mesmo número de tentativas.</li>
+      <li>Teste um chacoalhão que aumenta de força quando o programa fica muitas rodadas sem melhorar, e volta ao tamanho pequeno assim que melhora. É exatamente o truque usado no segundo PDF.</li>
+    </ol>
+  </div>
+</section>
+
+<section id="p10">
+  <div class="num">PARTE 10</div>
+  <h2>E aqueles dois PDFs?</h2>
+  <p class="lede">Os dois documentos são bem mais avançados que este caderno. Mas agora você tem o suficiente para abrir os dois e entender partes de cada um.</p>
+
+  <h3>Notas de aula de Marcone Souza (UFOP, 2022)</h3>
+  <p>É um catálogo de métodos em português. Cada método vem com uma explicação curta, um passo a passo e um exemplo resolvido, quase sempre com a mesma mochila e o mesmo mapa de 6 pontos que você viu aqui, porque este caderno foi construído a partir dele.</p>
+  <p><strong>Leia agora:</strong> seções 1, 2, 3.1 e 3.2, e as partes de recozimento simulado, busca tabu e busca local iterada dentro da seção 4. Você vai reconhecer tudo, só com nomes mais formais.</p>
+  <p><strong>Deixe para depois:</strong> o resto da seção 4 (algoritmos genéticos, colônia de formigas, e os métodos com nomes de física) e a seção 5 inteira.</p>
+
+  <h3>Artigo de Thomas Stützle (2006)</h3>
+  <p>É um artigo científico, em inglês, sobre a busca local iterada aplicada a um problema específico: descobrir em qual sala colocar cada setor de um hospital, de forma que os setores que mais trocam pacientes fiquem perto uns dos outros.</p>
+  <p><strong>Leia agora:</strong> a introdução e a seção 2, que apresenta as quatro peças da busca local iterada. Você já conhece as quatro.</p>
+  <p><strong>Deixe para depois:</strong> as seções 3, 4 e 5, que são análise estatística de desempenho. Elas são o coração do artigo, mas exigem estatística que você ainda vai ver na faculdade.</p>
+
+  <h3>O que o artigo descobriu, em uma frase</h3>
+  <p>Que a versão simples da busca local iterada, aquela que só aceita melhorias, trava depois de um tempo: ela fica dando voltas sem progredir. E que aceitar piora de vez em quando, ou manter várias respostas ao mesmo tempo em vez de uma só, resolve o problema. Ou seja: o "jeito 4" da parte 6 fica muito melhor quando você mistura ele com o "jeito 2".</p>
+
+  <div class="box">
+    <div class="t">Uma dica de leitura</div>
+    <p>Artigo científico não se lê do começo ao fim como um livro. Leia o resumo, pule para a conclusão, e só então volte para o meio, procurando as partes que respondem ao que a conclusão afirma. Se você não entender uma seção, siga em frente: isso é normal, inclusive para quem já é da área.</p>
+  </div>
+</section>
+
+<section id="dic">
+  <div class="num">PARTE 11</div>
+  <h2>Dicionário de palavras difíceis</h2>
+  <p class="lede">Os termos que você vai encontrar nos PDFs, traduzidos para o que eles realmente querem dizer.</p>
+
+  <div class="tbl"><table>
+    <thead><tr><th>Palavra difícil</th><th>O que quer dizer</th></tr></thead>
+    <tbody>
+      <tr><td>Função objetivo</td><td>A nota da resposta</td></tr>
+      <tr><td>Solução</td><td>Uma resposta possível, boa ou ruim</td></tr>
+      <tr><td>Solução viável</td><td>Uma resposta que respeita as regras</td></tr>
+      <tr><td>Espaço de soluções</td><td>O conjunto de todas as respostas possíveis</td></tr>
+      <tr><td>Movimento</td><td>A mudancinha que transforma uma resposta em outra</td></tr>
+      <tr><td>Vizinhança</td><td>Todas as respostas que dá para alcançar com uma mudancinha</td></tr>
+      <tr><td>Ótimo local</td><td>Vale raso: nenhum vizinho é melhor, mas existe coisa melhor longe dali</td></tr>
+      <tr><td>Ótimo global</td><td>A melhor resposta de todas</td></tr>
+      <tr><td>Heurística</td><td>Uma regra prática que costuma dar certo, sem garantia</td></tr>
+      <tr><td>Heurística gulosa</td><td>Regra que sempre pega o que parece melhor no momento</td></tr>
+      <tr><td>Busca local</td><td>Ir para o melhor vizinho até não dar mais</td></tr>
+      <tr><td>Metaheurística</td><td>Receita geral para procurar bem, que serve para qualquer problema</td></tr>
+      <tr><td>Perturbação</td><td>O chacoalhão</td></tr>
+      <tr><td>Intensificação</td><td>Procurar melhor bem perto de onde você já está</td></tr>
+      <tr><td>Diversificação</td><td>Ir procurar em outro lugar</td></tr>
+      <tr><td>NP-difícil</td><td>Categoria de problemas em que ninguém conhece um jeito rápido e garantido de achar a melhor resposta</td></tr>
+      <tr><td>Instância</td><td>Um caso específico do problema, com números concretos</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="ex">
+    <h4>Revisão final</h4>
+    <ol>
+      <li>Quais são as três peças de todo problema de otimização?
+        <div class="alts" data-c="a">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">Representação, função objetivo e restrições</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">Entrada, processamento e saída de dados</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">Vizinhança, ótimo local e ótimo global</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">Estrutura de dados, algoritmo e resultado</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q35"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div><p>Representação (como escrevo uma resposta), função objetivo (quanto ela vale) e restrições (o que é permitido).</p></div></details>
+      </li>
+      <li>Por que não dá para simplesmente testar todas as respostas?
+        <div class="alts" data-c="a">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">Porque o número de respostas cresce rápido demais</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">Porque a linguagem usada é muito lenta</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">Porque falta memória para guardar todas elas</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">Porque os computadores de hoje ainda são lentos</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q36"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div><p>Porque a quantidade de respostas cresce muito rápido conforme o problema aumenta. Com 100 itens na mochila, o número de combinações é maior que a idade do universo em segundos. Comprar um computador mais rápido não resolve isso.</p></div></details>
+      </li>
+      <li>O que é um vizinho e por que essa ideia é tão útil?
+        <div class="alts" data-c="c">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">A melhor resposta que existe perto da atual; é útil porque é sempre a certa</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">Qualquer outra resposta do problema; é útil porque cobre o espaço todo</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">Uma resposta obtida com uma mudança pequena; são poucas e já melhoram muito</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">Uma resposta inválida de propósito; é útil para testar as restrições</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q37"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div><p>Vizinho é uma resposta obtida com uma mudança pequena. É útil porque olhar os vizinhos custa pouco (o número de vizinhos cresce devagar) e ainda assim permite melhorar bastante, passo a passo.</p></div></details>
+      </li>
+      <li>Onde a busca local para, e por que isso é um problema?
+        <div class="alts" data-c="a">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">Em um ótimo local, que pode estar longe da melhor</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">Sempre que o tempo acaba, o que é imprevisível</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">Em uma resposta inválida, o que exige corrigir depois</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">No ótimo global sempre; então não há problema nenhum</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q38"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div><p>Ela para em um ótimo local: um ponto onde nenhum vizinho é melhor. É um problema porque esse ponto pode estar bem longe da melhor resposta de verdade, e o programa não tem como perceber isso sozinho.</p></div></details>
+      </li>
+      <li>Cite os quatro jeitos de escapar de um ótimo local vistos na parte 6.
+        <div class="alts" data-c="a">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">Tentar de novo, aceitar piorar, proibir voltar e sacudir</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">Construção gulosa, busca aleatória, exata e aproximada</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">Ordenar as respostas, buscar, comparar e então repetir</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">Dividir o problema, conquistar, combinar e depois repetir</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q39"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div><p>Tentar de novo de outro ponto de partida; aceitar piorar de vez em quando (recozimento simulado); proibir desfazer as últimas mudanças (busca tabu); e chacoalhar a resposta e descer de novo (busca local iterada).</p></div></details>
+      </li>
+      <li>Por que não basta rodar o programa uma vez para saber se ele é bom?
+        <div class="alts" data-c="d">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">Porque o computador esquenta e fica mais lento</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">Porque uma execução só não usa memória suficiente</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">Porque uma execução sozinha está sempre errada</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">Porque ele usa sorteio e cada execução varia</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q40"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div><p>Porque ele usa sorteio, então cada execução dá um resultado diferente. Uma execução isolada pode ter sido sorte ou azar. É preciso rodar várias vezes e olhar média, melhor e pior.</p></div></details>
+      </li>
+      <li>Um programa devolveu uma rota de 87 km. Como você deve descrever esse resultado?
+        <div class="alts" data-c="b">
+          <button type="button" class="alt" data-k="a"><span class="k">a</span><span class="txt">"A rota mais curta é de 87 km"</span></button>
+          <button type="button" class="alt" data-k="b"><span class="k">b</span><span class="txt">"A melhor rota que eu encontrei foi de 87 km"</span></button>
+          <button type="button" class="alt" data-k="c"><span class="k">c</span><span class="txt">"87 km é o ótimo global deste problema"</span></button>
+          <button type="button" class="alt" data-k="d"><span class="k">d</span><span class="txt">"Está provado que nenhuma rota é menor que 87 km"</span></button>
+        </div>
+        <p class="fb" hidden></p>
+        <details class="trava" data-q="q41"><summary><span class="sumtxt">Responda para liberar a explicação</span></summary><div><p>Como "a melhor rota que encontrei foi de 87 km", e não "a rota mais curta é 87 km". Sem testar todas as rotas ou sem uma prova matemática, não se sabe se existe uma melhor.</p></div></details>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<footer style="border-top:1px solid var(--line);margin-top:64px;padding-top:26px;font-size:14.5px;color:var(--faint)">
+  <p style="margin-bottom:8px"><strong style="color:var(--muted)">Este caderno foi montado a partir de</strong></p>
+  <p style="margin-bottom:4px">Souza, M. J. F. <em>Inteligência Computacional para Otimização: metaheurísticas</em>. Universidade Federal de Ouro Preto, 2022.</p>
+  <p>Stützle, T. Iterated local search for the quadratic assignment problem. <em>European Journal of Operational Research</em>, 174(3), 2006.</p>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  var t = document.getElementById("temp");
+  if (!t) return;
+  var out = document.getElementById("tval");
+  var pioras = [1, 5, 20];
+  function render() {
+    var T = parseFloat(t.value);
+    out.textContent = T.toFixed(1).replace(".", ",");
+    for (var i = 0; i < pioras.length; i++) {
+      var p = Math.exp(-pioras[i] / T);
+      document.getElementById("b" + (i + 1)).style.width = (p * 100).toFixed(1) + "%";
+      document.getElementById("v" + (i + 1)).textContent = Math.round(p * 100) + "%";
+    }
+  }
+  t.addEventListener("input", render);
+  render();
+})();
+
+/* ---- escolha da linguagem ---- */
+(function () {
+  var CHAVE = "otimizacao-zero-linguagem";
+  var raiz = document.documentElement;
+
+  function aplica(lang, salvar) {
+    raiz.setAttribute("data-lang", lang);
+    raiz.classList.add("escolhido");
+    [].forEach.call(document.querySelectorAll(".seg button"), function (b) {
+      b.setAttribute("aria-pressed", b.getAttribute("data-lang") === lang ? "true" : "false");
+    });
+    if (salvar) { try { localStorage.setItem(CHAVE, lang); } catch (e) {} }
+  }
+
+  [].forEach.call(document.querySelectorAll(".escolha"), function (b) {
+    b.addEventListener("click", function () {
+      aplica(b.getAttribute("data-escolha"), true);
+      window.scrollTo(0, 0);
+    });
+  });
+
+  [].forEach.call(document.querySelectorAll(".seg button"), function (b) {
+    b.addEventListener("click", function () { aplica(b.getAttribute("data-lang"), true); });
+  });
+
+  var atual = raiz.getAttribute("data-lang");
+  if (atual) aplica(atual, false);
+})();
+
+/* ---- exercícios: uma tentativa por questão, depois libera a explicação ---- */
+(function () {
+  var CHAVE = "otimizacao-zero-respostas";
+  var salvo = {};
+  try { salvo = JSON.parse(localStorage.getItem(CHAVE) || "{}"); } catch (e) { salvo = {}; }
+
+  function guarda() {
+    try { localStorage.setItem(CHAVE, JSON.stringify(salvo)); } catch (e) {}
+  }
+
+  var itens = [].slice.call(document.querySelectorAll("details.trava"));
+  var feitos = document.getElementById("feitos");
+  var total = document.getElementById("total");
+  if (total) total.textContent = itens.length;
+
+  function atualizaProgresso() {
+    if (feitos) feitos.textContent = Object.keys(salvo).length;
+  }
+
+  function libera(det) {
+    det.classList.add("livre");
+    var txt = det.querySelector(".sumtxt");
+    if (txt) txt.textContent = "Ver a explicação";
+  }
+
+  itens.forEach(function (det) {
+    var id = det.getAttribute("data-q");
+    var li = det.parentNode;
+    var alts = li.querySelector(".alts");
+    var fb = li.querySelector(".fb");
+    var botaoAberta = li.querySelector(".destrava");
+
+    det.querySelector("summary").addEventListener("click", function (e) {
+      if (!det.classList.contains("livre")) e.preventDefault();
+    });
+
+    if (alts) {
+      var certa = alts.getAttribute("data-c");
+      var opcoes = [].slice.call(alts.querySelectorAll(".alt"));
+
+      function responde(escolha, novo) {
+        alts.classList.add("respondida");
+        opcoes.forEach(function (b) {
+          var k = b.getAttribute("data-k");
+          if (k === certa) b.classList.add("certa");
+          else if (k === escolha) b.classList.add("errada");
+        });
+        if (fb) {
+          fb.hidden = false;
+          if (escolha === certa) {
+            fb.className = "fb ok";
+            fb.textContent = "Você acertou.";
+          } else {
+            fb.className = "fb nao";
+            fb.textContent = "Não foi essa. A resposta certa é a letra " + certa + ". Veja o porquê abaixo.";
+          }
+        }
+        libera(det);
+        if (novo) { salvo[id] = escolha; guarda(); atualizaProgresso(); }
+      }
+
+      opcoes.forEach(function (b) {
+        b.addEventListener("click", function () {
+          if (alts.classList.contains("respondida")) return;
+          responde(b.getAttribute("data-k"), true);
+        });
+      });
+
+      if (salvo[id]) responde(salvo[id], false);
+
+    } else if (botaoAberta) {
+      function abre(novo) {
+        botaoAberta.parentNode.remove();
+        libera(det);
+        if (novo) { salvo[id] = "aberta"; guarda(); atualizaProgresso(); }
+      }
+      botaoAberta.addEventListener("click", function () { abre(true); });
+      if (salvo[id]) abre(false);
+    }
+  });
+
+  atualizaProgresso();
+
+  var reset = document.getElementById("reset");
+  if (reset) {
+    reset.addEventListener("click", function () {
+      salvo = {};
+      try {
+        localStorage.removeItem(CHAVE);
+        localStorage.removeItem("otimizacao-zero-linguagem");
+      } catch (e) {}
+      location.reload();
+    });
+  }
+})();
+</script>
+
+</body>
+</html>
